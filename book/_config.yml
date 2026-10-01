@@ -1,0 +1,14 @@
+title: "Proyecto Integrador de Aprendizaje Automático - Lending Club Loan Data"
+author: "Santiago Díaz, Gina Huguet y Leiry Mares"
+logo: ""
+
+execute:
+  execute_notebooks: "off"
+
+latex:
+  latex_documents:
+    targetname: book.tex
+
+html:
+  use_issues_button: false
+  use_repository_button: false

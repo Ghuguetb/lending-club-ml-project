@@ -1,0 +1,11 @@
+format: jb-book
+root: 00_intro
+chapters:
+  - file: 01_eda
+  - file: 02_preprocesamiento
+  - file: 03_modelado_sklearn
+  - file: 04_modelado_pyspark
+  - file: 05_delong
+  - file: 06_mcnemar_bootstrap
+  - file: 07_lime
+  - file: 08_conclusiones

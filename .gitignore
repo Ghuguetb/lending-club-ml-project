@@ -1,0 +1,24 @@
+# Datos y artefactos pesados (no se versionan)
+data/
+outputs/
+*.parquet
+spark_best_model_GBT/
+spark_preprocessing_pipeline/
+
+# Entornos y cachés
+.venv/
+__pycache__/
+*.pyc
+
+# Logs de ejecución local
+*.log
+
+# Builds locales de Jupyter Book (el sitio publicado vive en docs/)
+_build/
+.jupyter_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store

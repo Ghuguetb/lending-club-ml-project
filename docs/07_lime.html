@@ -1,0 +1,681 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>7. Interpretabilidad con LIME &#8212; Proyecto Integrador de Aprendizaje Automático - Lending Club Loan Data</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '07_lime';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="8. Comparación final y reflexión crítica" href="08_conclusiones.html" />
+    <link rel="prev" title="6. McNemar y bootstrap pareado, con el umbral elegido solo con datos de entrenamiento" href="06_mcnemar_bootstrap.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="00_intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Proyecto Integrador de Aprendizaje Automático - Lending Club Loan Data</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="00_intro.html">
+                    Tarea 1: Proyecto Integrador de Aprendizaje Automático
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_eda.html">1. Exploración de Datos (EDA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_preprocesamiento.html">2. Preprocesamiento</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_modelado_sklearn.html">3. Modelado con scikit-learn</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_modelado_pyspark.html">4. Modelado con PySpark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_delong.html">5. Prueba de DeLong con corrección de Holm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_mcnemar_bootstrap.html">6. McNemar y bootstrap pareado, con el umbral elegido solo con datos de entrenamiento</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">7. Interpretabilidad con LIME</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_conclusiones.html">8. Comparación final y reflexión crítica</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/07_lime.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>7. Interpretabilidad con LIME</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#datos-de-fondo-para-lime">7.1. Datos de fondo para LIME</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#un-hallazgo-que-no-esperabamos-al-preparar-esto-las-dos-representaciones-no-son-identicas">Un hallazgo que no esperábamos al preparar esto: las dos representaciones no son idénticas</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lime-sobre-scikit-learn-histgradientboostingclassifier">7.2. LIME sobre scikit-learn (<code class="docutils literal notranslate"><span class="pre">HistGradientBoostingClassifier</span></code>)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lime-sobre-pyspark-gbtclassifier-el-reto-de-envolver-un-modelo-distribuido">7.3. LIME sobre PySpark (<code class="docutils literal notranslate"><span class="pre">GBTClassifier</span></code>): el reto de envolver un modelo distribuido</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#limitaciones-de-lime-en-general-y-de-aplicarlo-sobre-un-modelo-de-spark-en-particular">7.4. Limitaciones de LIME en general, y de aplicarlo sobre un modelo de Spark en particular</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="interpretabilidad-con-lime">
+<h1>7. Interpretabilidad con LIME<a class="headerlink" href="#interpretabilidad-con-lime" title="Link to this heading">#</a></h1>
+<p>LIME (Ribeiro, Singh y Guestrin, 2016) sirve para explicar una sola predicción de un modelo de caja negra. Genera muchas variantes perturbadas de esa instancia, le pide al modelo sus probabilidades para cada una, y ajusta un modelo lineal local (ponderado según qué tan cerca está cada variante de la instancia original) sobre esas perturbaciones. Los coeficientes de ese modelo local son la explicación: qué tanto empujó cada variable la predicción hacia una clase o la otra, en la vecindad de este caso particular. No es una explicación global del modelo completo.</p>
+<p>Aplicamos LIME al mejor modelo de cada entorno por AUC de prueba: <code class="docutils literal notranslate"><span class="pre">HistGradientBoostingClassifier</span></code> en scikit-learn (AUC de 0,739, sección 3) y <code class="docutils literal notranslate"><span class="pre">GBTClassifier</span></code> en PySpark (AUC de 0,733, sección 4).</p>
+<p>En cada entorno explicamos dos instancias del conjunto de prueba que quedaron mal clasificadas al umbral natural de 0,5 (no el umbral de Youden de la sección 6, porque aquí el objetivo es solo ilustrar el comportamiento del modelo en un error, no simular una política de decisión real): un falso positivo (predijo incumplimiento y no lo hubo) y un falso negativo (predijo que pagaría y terminó incumpliendo).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">"../src"</span><span class="p">)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.image</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpimg</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">sparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">joblib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">lime.lime_tabular</span>
+
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">"display.width"</span><span class="p">,</span> <span class="mi">160</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Librerias cargadas."</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Librerias cargadas.
+</pre></div>
+</div>
+</div>
+</div>
+<section id="datos-de-fondo-para-lime">
+<h2>7.1. Datos de fondo para LIME<a class="headerlink" href="#datos-de-fondo-para-lime" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">LimeTabularExplainer</span></code> necesita una muestra representativa del conjunto de entrenamiento para estimar la distribución de cada variable (la media y la desviación de las numéricas, la frecuencia de cada categoría ya codificada en one-hot). No hace falta usar las 1,8 millones de filas completas para esto. Una submuestra aleatoria estratificada de 30.000 filas (con semilla fija, en <code class="docutils literal notranslate"><span class="pre">src/prepare_lime_backgrounds.py</span></code>) es más que suficiente y evita tener que convertir a denso el conjunto de entrenamiento completo.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bg_sklearn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">"../data/lime_background_sklearn.npz"</span><span class="p">)[</span><span class="s2">"X"</span><span class="p">]</span>
+<span class="n">bg_spark</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">"../data/lime_background_spark.npz"</span><span class="p">)[</span><span class="s2">"X"</span><span class="p">]</span>
+<span class="n">nombres_sklearn</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s2">"../data/sklearn_feature_names.json"</span><span class="p">))</span>
+<span class="n">nombres_spark</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s2">"../data/lime_feature_names_spark.json"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Fondo scikit-learn: </span><span class="si">{</span><span class="n">bg_sklearn</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">  (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">nombres_sklearn</span><span class="p">)</span><span class="si">}</span><span class="s2"> variables)"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Fondo PySpark:      </span><span class="si">{</span><span class="n">bg_spark</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">  (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">nombres_spark</span><span class="p">)</span><span class="si">}</span><span class="s2"> variables)"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Fondo scikit-learn: (30000, 114)  (114 variables)
+Fondo PySpark:      (30000, 107)  (107 variables)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="un-hallazgo-que-no-esperabamos-al-preparar-esto-las-dos-representaciones-no-son-identicas">
+<h3>Un hallazgo que no esperábamos al preparar esto: las dos representaciones no son idénticas<a class="headerlink" href="#un-hallazgo-que-no-esperabamos-al-preparar-esto-las-dos-representaciones-no-son-identicas" title="Link to this heading">#</a></h3>
+<p>Los dos entornos parten de las mismas 14 variables numéricas (mismo orden, mismo escalado) y las mismas 8 variables categóricas, pero el número de columnas one-hot resultante no coincide: 114 en scikit-learn contra 107 en PySpark. La razón es que el <code class="docutils literal notranslate"><span class="pre">OneHotEncoder</span></code> de scikit-learn (con <code class="docutils literal notranslate"><span class="pre">handle_unknown=\&quot;ignore\&quot;</span></code>) le da una columna explícita a cada categoría observada, incluido <code class="docutils literal notranslate"><span class="pre">NaN</span></code> cuando aparece como valor en los datos de entrenamiento (por eso existen columnas como <code class="docutils literal notranslate"><span class="pre">term_nan</span></code> o <code class="docutils literal notranslate"><span class="pre">application_type_nan</span></code>). El <code class="docutils literal notranslate"><span class="pre">OneHotEncoder</span></code> de Spark, en cambio, usa por defecto <code class="docutils literal notranslate"><span class="pre">dropLast=True</span></code>, es decir que deja caer la última categoría de cada variable, típicamente la que <code class="docutils literal notranslate"><span class="pre">StringIndexer</span></code> le asigna a los valores nulos o no vistos, así que esa categoría queda implícita en el vector de ceros en vez de tener su propia columna. Dos pipelines que en concepto son iguales (mismo imputador, mismo escalador, mismo tipo de codificador) terminan produciendo espacios de variables de dimensión distinta solo por una diferencia de configuración entre librerías, no por el método en sí. Esto significa que, aunque las 452.141 filas de prueba son las mismas en los dos entornos, no existe un vector de variables “canónico” al que se puedan mapear uno a uno las explicaciones de LIME de un entorno y del otro. Cada explicación se interpreta dentro de su propio espacio de variables.</p>
+</section>
+</section>
+<section id="lime-sobre-scikit-learn-histgradientboostingclassifier">
+<h2>7.2. LIME sobre scikit-learn (<code class="docutils literal notranslate"><span class="pre">HistGradientBoostingClassifier</span></code>)<a class="headerlink" href="#lime-sobre-scikit-learn-histgradientboostingclassifier" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">models</span> <span class="o">=</span> <span class="n">joblib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">"../data/sklearn_fitted_models.joblib"</span><span class="p">)</span>
+<span class="n">gbt_sklearn</span> <span class="o">=</span> <span class="n">models</span><span class="p">[</span><span class="s2">"GBT_HistGB"</span><span class="p">]</span>
+
+<span class="n">X_test_sk</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">load_npz</span><span class="p">(</span><span class="s2">"../data/sklearn_X_test.npz"</span><span class="p">)</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+<span class="n">y_test_sk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">"../data/sklearn_y_test.npy"</span><span class="p">)</span>
+
+<span class="n">explainer_sklearn</span> <span class="o">=</span> <span class="n">lime</span><span class="o">.</span><span class="n">lime_tabular</span><span class="o">.</span><span class="n">LimeTabularExplainer</span><span class="p">(</span>
+    <span class="n">training_data</span><span class="o">=</span><span class="n">bg_sklearn</span><span class="p">,</span>
+    <span class="n">feature_names</span><span class="o">=</span><span class="n">nombres_sklearn</span><span class="p">,</span>
+    <span class="n">class_names</span><span class="o">=</span><span class="p">[</span><span class="s2">"No default"</span><span class="p">,</span> <span class="s2">"Default"</span><span class="p">],</span>
+    <span class="n">categorical_features</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">nombres_sklearn</span><span class="p">))),</span>  <span class="c1"># las primeras 14 son numericas</span>
+    <span class="n">discretize_continuous</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Explainer de scikit-learn listo."</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Explainer de scikit-learn listo.
+</pre></div>
+</div>
+</div>
+</div>
+<p>Elegimos las dos instancias a explicar con una semilla fija en <code class="docutils literal notranslate"><span class="pre">src/run_lime_sklearn.py</span></code> (que usa exactamente el mismo explainer de arriba). Acá cargamos esos resultados ya calculados en vez de volver a correr <code class="docutils literal notranslate"><span class="pre">explain_instance</span></code> en esta celda, para que el notebook no dependa de que la explicación aleatoria coincida exactamente cada vez que se vuelve a ejecutar.</p>
+<p>En el falso positivo (id 1412565, probabilidad predicha de 0,508, apenas por encima de 0,5), la variable que más empuja hacia “default” es <code class="docutils literal notranslate"><span class="pre">int_rate</span> <span class="pre">&gt;</span> <span class="pre">0,60</span></code>, es decir una tasa de interés en el percentil más alto de la distribución escalada. Esto tiene sentido porque la tasa de interés es, para cualquier prestamista, la señal de riesgo más directa que existe: a los créditos más riesgosos se les cobra más. El resto de las variables son columnas <code class="docutils literal notranslate"><span class="pre">sub_grade_*</span></code> y <code class="docutils literal notranslate"><span class="pre">application_type_*</span></code> en 0, con pesos pequeños, que son la contribución marginal (porque no están presentes) de las docenas de categorías que el modelo descarta al explicar este caso. El <code class="docutils literal notranslate"><span class="pre">R²</span></code> local de 0,44 nos dice que el modelo lineal local captura una parte razonable, aunque no completa, del comportamiento de <code class="docutils literal notranslate"><span class="pre">HistGradientBoostingClassifier</span></code> en esta vecindad.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">resultados_sklearn</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s2">"../outputs/tables/lime_sklearn_resultados.json"</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">etiqueta</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">resultados_sklearn</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">etiqueta</span><span class="si">}</span><span class="s2">: id=</span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="si">}</span><span class="s2">  y_real=</span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'y_real'</span><span class="p">]</span><span class="si">}</span><span class="s2">  prob_predicha=</span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'prob_predicha'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">  "</span>
+          <span class="sa">f</span><span class="s2">"pred=</span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'pred_label'</span><span class="p">]</span><span class="si">}</span><span class="s2">  R²_local=</span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'r2_local'</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>falso_positivo: id=1412565  y_real=0  prob_predicha=0.5084  pred=1  R²_local=0.442
+falso_negativo: id=17232974  y_real=1  prob_predicha=0.1280  pred=0  R²_local=0.091
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">etiqueta</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="p">[</span><span class="s2">"falso_positivo"</span><span class="p">,</span> <span class="s2">"falso_negativo"</span><span class="p">]):</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">mpimg</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="sa">f</span><span class="s2">"../outputs/figures/eda/lime_sklearn_</span><span class="si">{</span><span class="n">etiqueta</span><span class="si">}</span><span class="s2">.png"</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">"off"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">etiqueta</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"_"</span><span class="p">,</span> <span class="s2">" "</span><span class="p">)</span><span class="o">.</span><span class="n">capitalize</span><span class="p">())</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/407053b04314f1ac1423a6fd640e5a96bd36fd8d05b7a90fba40e6116bfa3225.png" src="_images/407053b04314f1ac1423a6fd640e5a96bd36fd8d05b7a90fba40e6116bfa3225.png" />
+</div>
+</div>
+<p>En el falso negativo (id 17232974, probabilidad predicha de 0,128, bastante lejos de 0,5), la tasa de interés esta vez juega en la dirección opuesta (<code class="docutils literal notranslate"><span class="pre">int_rate</span></code> en un rango bajo o medio, empujando hacia “no default”), aunque la persona sí incumplió. Con la información disponible, el modelo no tenía ninguna señal fuerte para anticipar este caso. El <code class="docutils literal notranslate"><span class="pre">R²</span></code> local aquí es de solo 0,09, es decir que la aproximación lineal explica muy poco de lo que hace el modelo en esta vecindad, así que esta explicación en particular habría que tomarla con más cautela que la anterior. Esto, en sí mismo, es un diagnóstico útil de cuándo confiar o no en una explicación de LIME.</p>
+</section>
+<section id="lime-sobre-pyspark-gbtclassifier-el-reto-de-envolver-un-modelo-distribuido">
+<h2>7.3. LIME sobre PySpark (<code class="docutils literal notranslate"><span class="pre">GBTClassifier</span></code>): el reto de envolver un modelo distribuido<a class="headerlink" href="#lime-sobre-pyspark-gbtclassifier-el-reto-de-envolver-un-modelo-distribuido" title="Link to this heading">#</a></h2>
+<p>LIME espera una función de Python (<code class="docutils literal notranslate"><span class="pre">predict_fn</span></code>) que reciba un arreglo de NumPy y devuelva probabilidades, que es exactamente lo que hace <code class="docutils literal notranslate"><span class="pre">predict_proba</span></code> en scikit-learn. Un <code class="docutils literal notranslate"><span class="pre">GBTClassificationModel</span></code> de Spark no tiene ese método, solo sabe transformar un DataFrame de Spark. Hace falta un adaptador que, cada vez que LIME llama a <code class="docutils literal notranslate"><span class="pre">predict_fn</span></code> con un lote de muestras perturbadas (<code class="docutils literal notranslate"><span class="pre">num_samples=5000</span></code> para cada instancia explicada), lo convierta a DataFrame, lo pase por <code class="docutils literal notranslate"><span class="pre">.transform()</span></code>, y traiga el resultado de vuelta a NumPy:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">predict_fn_spark</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>\<span class="n">n</span>    <span class="n">filas</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">Vectors</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span><span class="n">fila</span><span class="o">.</span><span class="n">tolist</span><span class="p">()))</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">fila</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">X</span><span class="p">)]</span>\<span class="n">n</span>    <span class="n">df</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">filas</span><span class="p">,</span> <span class="p">[</span>\<span class="s2">"_orden</span><span class="se">\"</span><span class="s2">, </span><span class="se">\"</span><span class="s2">features</span><span class="se">\"</span><span class="s2">])</span><span class="se">\n</span><span class="s2">    pred = gbt_model.transform(df).withColumn(</span><span class="se">\"</span><span class="s2">proba_arr</span><span class="se">\"</span><span class="s2">, vector_to_array(</span><span class="se">\"</span><span class="s2">probability</span><span class="se">\"</span><span class="s2">))</span><span class="se">\n</span><span class="s2">    pdf = pred.select(</span><span class="se">\"</span><span class="s2">_orden</span><span class="se">\"</span><span class="s2">, </span><span class="se">\"</span><span class="s2">proba_arr</span><span class="se">\"</span><span class="s2">).toPandas().sort_values(</span><span class="se">\"</span><span class="s2">_orden</span><span class="se">\"</span><span class="s2">)</span><span class="se">\n</span><span class="s2">    return np.stack(pdf[</span><span class="se">\"</span><span class="s2">proba_arr</span><span class="se">\"</span><span class="s2">].values)</span>
+</pre></div>
+</div>
+<p>Hay dos detalles importantes acá. El primero es que el <code class="docutils literal notranslate"><span class="pre">_orden</span></code> explícito es necesario porque Spark no garantiza que las filas salgan de <code class="docutils literal notranslate"><span class="pre">.transform()</span></code> en el mismo orden en que entraron, y sin reordenar, LIME asociaría cada probabilidad con la perturbación equivocada. El segundo es que el <code class="docutils literal notranslate"><span class="pre">.toPandas()</span></code> acá es sobre un lote de 5.000 filas (una instancia perturbada a la vez), no sobre el dataset completo, así que no viola la restricción de la sección 4 sobre no recolectar datos completos a memoria local.</p>
+<p>En la práctica, cada llamada a <code class="docutils literal notranslate"><span class="pre">explain_instance</span></code> (que dispara un solo lote de 5.000 filas por Spark) tomó entre 1 y 3 segundos en esta máquina, bastante rápido porque es un Spark local de 2 núcleos sin el overhead real de una red o un clúster.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">resultados_spark</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s2">"../outputs/tables/lime_spark_resultados.json"</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">etiqueta</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">resultados_spark</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">etiqueta</span><span class="si">}</span><span class="s2">: id=</span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="si">}</span><span class="s2">  y_real=</span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'y_real'</span><span class="p">]</span><span class="si">}</span><span class="s2">  prob_predicha=</span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'prob_predicha'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">  "</span>
+          <span class="sa">f</span><span class="s2">"pred=</span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'pred_label'</span><span class="p">]</span><span class="si">}</span><span class="s2">  R²_local=</span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'r2_local'</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>falso_positivo: id=60981901  y_real=0  prob_predicha=0.5591  pred=1  R²_local=0.359
+falso_negativo: id=9776027  y_real=1  prob_predicha=0.1468  pred=0  R²_local=0.087
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">etiqueta</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="p">[</span><span class="s2">"falso_positivo"</span><span class="p">,</span> <span class="s2">"falso_negativo"</span><span class="p">]):</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">mpimg</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="sa">f</span><span class="s2">"../outputs/figures/eda/lime_spark_</span><span class="si">{</span><span class="n">etiqueta</span><span class="si">}</span><span class="s2">.png"</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">"off"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">etiqueta</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"_"</span><span class="p">,</span> <span class="s2">" "</span><span class="p">)</span><span class="o">.</span><span class="n">capitalize</span><span class="p">())</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/2c0ba69dd3dbc3199d44e2426e3466921dd6a32ba405b755195c1c542ff581a4.png" src="_images/2c0ba69dd3dbc3199d44e2426e3466921dd6a32ba405b755195c1c542ff581a4.png" />
+</div>
+</div>
+<p>Los dos casos que elegimos en PySpark son instancias distintas a las de scikit-learn (cada modelo se equivoca en casos distintos, y no hay ninguna garantía de que el mismo id sea un error en los dos entornos), pero el patrón que aparece es muy parecido: en el falso positivo (id 60981901, probabilidad de 0,559), <code class="docutils literal notranslate"><span class="pre">int_rate</span> <span class="pre">&gt;</span> <span class="pre">0,60</span></code> vuelve a ser la señal dominante hacia “default” (<code class="docutils literal notranslate"><span class="pre">R²</span></code> local de 0,36, razonable); en el falso negativo (id 9776027, probabilidad de 0,147), el modelo tampoco tenía señal fuerte, y el <code class="docutils literal notranslate"><span class="pre">R²</span></code> local vuelve a caer a 0,09, casi idéntico al 0,09 del falso negativo de scikit-learn. Esta coincidencia no nos parece casual: el ajuste lineal local de LIME es sistemáticamente peor para los falsos negativos que para los falsos positivos, en los dos entornos. Probablemente porque los casos de incumplimiento “sorpresa” (probabilidad baja, pero sí incumplen) están, casi por definición, en zonas del espacio de variables donde el comportamiento real del modelo es más no lineal, justo donde una aproximación lineal local es menos fiel.</p>
+</section>
+<section id="limitaciones-de-lime-en-general-y-de-aplicarlo-sobre-un-modelo-de-spark-en-particular">
+<h2>7.4. Limitaciones de LIME en general, y de aplicarlo sobre un modelo de Spark en particular<a class="headerlink" href="#limitaciones-de-lime-en-general-y-de-aplicarlo-sobre-un-modelo-de-spark-en-particular" title="Link to this heading">#</a></h2>
+<p>Hay varias limitaciones que aplican a los dos entornos. LIME perturba y muestrea de forma aleatoria, así que con otra semilla el conjunto de variables “top 10” puede cambiar, sobre todo cuando, como aquí, hay decenas de columnas one-hot con pesos pequeños y parecidos compitiendo por los últimos lugares del ranking. La fidelidad local tampoco es constante: el <code class="docutils literal notranslate"><span class="pre">R²</span></code> del modelo lineal local fue bueno (entre 0,36 y 0,44) para los falsos positivos y pobre (0,09) para los falsos negativos. Una explicación con <code class="docutils literal notranslate"><span class="pre">R²</span></code> bajo no es necesariamente incorrecta, pero sí es una aproximación más floja de lo que realmente hace el modelo, y conviene reportar siempre ese número junto con la explicación, no solo la lista de variables. También hay bastante ruido de las variables dummy: con entre 93 y 107 columnas categóricas ya expandidas en one-hot, buena parte del “top 10” queda ocupado por columnas en 0 con peso marginal, lo cual es informativo hasta cierto punto, pero menos legible que si LIME pudiera tratar cada variable categórica original como una sola entidad en vez de docenas de columnas binarias.</p>
+<p>Aplicar LIME sobre un modelo entrenado en Spark tiene limitaciones propias. No existe una implementación de LIME nativa para Spark ML, así que tuvimos que escribir a mano el adaptador <code class="docutils literal notranslate"><span class="pre">predict_fn_spark</span></code> de la sección 7.3, con el riesgo de bugs que eso implica (el reordenamiento por <code class="docutils literal notranslate"><span class="pre">_orden</span></code>, por ejemplo, es fácil de pasar por alto y produciría explicaciones completamente erróneas sin ningún error visible). También hay un costo por cada instancia que se explica: cada llamada implica crear un DataFrame nuevo, un <code class="docutils literal notranslate"><span class="pre">.transform()</span></code> y un <code class="docutils literal notranslate"><span class="pre">.toPandas()</span></code>, que en esta máquina tomó entre 1 y 3 segundos por instancia en un Spark local de 2 núcleos. Para explicar un puñado de casos, como hicimos aquí, esto es perfectamente viable, pero para generar explicaciones de forma rutinaria para miles de instancias (por ejemplo, una por cada solicitud rechazada), ese costo por instancia se volvería el cuello de botella, y en un clúster real con overhead de red y de planificación por cada micro-lote sería todavía peor que en esta máquina. Por último, los dos entornos no comparten el mismo espacio de variables (114 contra 107 columnas, sección 7.1), así que las explicaciones de un entorno y del otro no se pueden alinear término a término, aunque describan en esencia el mismo tipo de modelo sobre los mismos datos originales.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="06_mcnemar_bootstrap.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">6. McNemar y bootstrap pareado, con el umbral elegido solo con datos de entrenamiento</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="08_conclusiones.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">8. Comparación final y reflexión crítica</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#datos-de-fondo-para-lime">7.1. Datos de fondo para LIME</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#un-hallazgo-que-no-esperabamos-al-preparar-esto-las-dos-representaciones-no-son-identicas">Un hallazgo que no esperábamos al preparar esto: las dos representaciones no son idénticas</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lime-sobre-scikit-learn-histgradientboostingclassifier">7.2. LIME sobre scikit-learn (<code class="docutils literal notranslate"><span class="pre">HistGradientBoostingClassifier</span></code>)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lime-sobre-pyspark-gbtclassifier-el-reto-de-envolver-un-modelo-distribuido">7.3. LIME sobre PySpark (<code class="docutils literal notranslate"><span class="pre">GBTClassifier</span></code>): el reto de envolver un modelo distribuido</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#limitaciones-de-lime-en-general-y-de-aplicarlo-sobre-un-modelo-de-spark-en-particular">7.4. Limitaciones de LIME en general, y de aplicarlo sobre un modelo de Spark en particular</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Santiago Díaz, Gina Huguet y Leiry Mares
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

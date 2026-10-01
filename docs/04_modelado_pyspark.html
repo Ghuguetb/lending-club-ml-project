@@ -1,0 +1,1005 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>4. Modelado con PySpark &#8212; Proyecto Integrador de Aprendizaje Automático - Lending Club Loan Data</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '04_modelado_pyspark';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="5. Prueba de DeLong con corrección de Holm" href="05_delong.html" />
+    <link rel="prev" title="3. Modelado con scikit-learn" href="03_modelado_sklearn.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="00_intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Proyecto Integrador de Aprendizaje Automático - Lending Club Loan Data</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="00_intro.html">
+                    Tarea 1: Proyecto Integrador de Aprendizaje Automático
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_eda.html">1. Exploración de Datos (EDA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_preprocesamiento.html">2. Preprocesamiento</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_modelado_sklearn.html">3. Modelado con scikit-learn</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">4. Modelado con PySpark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_delong.html">5. Prueba de DeLong con corrección de Holm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_mcnemar_bootstrap.html">6. McNemar y bootstrap pareado, con el umbral elegido solo con datos de entrenamiento</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_lime.html">7. Interpretabilidad con LIME</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_conclusiones.html">8. Comparación final y reflexión crítica</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/04_modelado_pyspark.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>4. Modelado con PySpark</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#carga-de-resultados-y-puntajes-guardados">4.1. Carga de resultados y puntajes guardados</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modelo-por-modelo-malla-de-hiperparametros-y-equivalencias-con-scikit-learn">4.2. Modelo por modelo: malla de hiperparámetros y equivalencias con scikit-learn</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#regresion-logistica">4.2.1. Regresión logística</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arbol-de-decision">4.2.2. Árbol de decisión</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bosque-aleatorio-el-mas-costoso-tambien-en-spark">4.2.3. Bosque aleatorio, el más costoso también en Spark</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gradient-boosting-gbtclassifier-nativo-sin-necesidad-de-sustituirlo">4.2.4. Gradient Boosting (<code class="docutils literal notranslate"><span class="pre">GBTClassifier</span></code> nativo, sin necesidad de sustituirlo)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#svm-lineal">4.2.5. SVM lineal</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#naive-bayes-gaussiano">4.2.6. Naive Bayes (gaussiano)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tabla-comparativa-final-pyspark">4.3. Tabla comparativa final (PySpark)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#curvas-roc-los-6-modelos-superpuestos">4.4. Curvas ROC (los 6 modelos superpuestos)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matrices-de-confusion-umbral-natural-0-5-de-probabilidad-o-margen-0">4.5. Matrices de confusión (umbral natural: 0,5 de probabilidad, o margen 0)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tres-hallazgos-que-solo-aparecen-al-comparar-con-scikit-learn">4.6. Tres hallazgos que solo aparecen al comparar con scikit-learn</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-el-arbol-de-decision-sigue-rindiendo-algo-peor-en-spark-incluso-ya-corregido-auc-0-720-contra-0-737">(a) El árbol de decisión sigue rindiendo algo peor en Spark, incluso ya corregido (AUC 0,720 contra 0,737)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#b-linearsvc-no-colapsa-en-spark-auc-0-704-contra-0-559-en-scikit-learn">(b) <code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code> no colapsa en Spark (AUC 0,704 contra 0,559 en scikit-learn)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#c-naive-bayes-el-mismo-error-que-en-a-no-una-diferencia-real-entre-librerias">(c) Naive Bayes: el mismo error que en (a), no una diferencia real entre librerías</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#costo-computacional-scikit-learn-contra-pyspark-modelo-por-modelo">4.7. Costo computacional: scikit-learn contra PySpark, modelo por modelo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sintesis-mejor-modelo-del-entorno-pyspark">4.8. Síntesis: mejor modelo del entorno PySpark</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="modelado-con-pyspark">
+<h1>4. Modelado con PySpark<a class="headerlink" href="#modelado-con-pyspark" title="Link to this heading">#</a></h1>
+<p>Entrenamos los mismos 6 modelos sobre la misma partición 80/20 (<code class="docutils literal notranslate"><span class="pre">data/split_assignment.parquet</span></code>) y las mismas variables de la sección 2.3, usando <code class="docutils literal notranslate"><span class="pre">pyspark.ml.tuning.CrossValidator</span></code> junto con <code class="docutils literal notranslate"><span class="pre">ParamGridBuilder</span></code> (<code class="docutils literal notranslate"><span class="pre">numFolds=3</span></code>, <code class="docutils literal notranslate"><span class="pre">BinaryClassificationEvaluator(metricName=\&quot;areaUnderROC\&quot;)</span></code>).</p>
+<p>Usamos la misma configuración reducida de Spark que en el preprocesamiento (sección 2.3): <code class="docutils literal notranslate"><span class="pre">driver.memory=4g</span></code>, <code class="docutils literal notranslate"><span class="pre">executor.memory=4g</span></code>, <code class="docutils literal notranslate"><span class="pre">shuffle.partitions=8</span></code> y <code class="docutils literal notranslate"><span class="pre">default.parallelism=8</span></code>, en vez de los 8g+8g y 400 particiones que pedía el enunciado, porque esta máquina tiene 7,8 GB de RAM y 2 núcleos reales. Es la misma máquina física que usamos para scikit-learn, así que la comparación de tiempos entre los dos entornos es justa.</p>
+<p>Usamos <code class="docutils literal notranslate"><span class="pre">CrossValidator(parallelism=1)</span></code>, es decir que cada combinación de pliegue e hiperparámetro se corre de forma secuencial, nunca en paralelo. En un clúster con muchos núcleos subir este número tendría sentido, pero en una máquina de 2 núcleos cada ajuste individual ya usa el paralelismo interno de Spark entre sus particiones, así que paralelizar también entre modelos de la grilla solo generaría competencia por los mismos 2 núcleos sin ninguna ganancia real.</p>
+<p>Para evitar traer el dataset completo al driver, en ningún punto del script llamamos <code class="docutils literal notranslate"><span class="pre">.toPandas()</span></code> ni <code class="docutils literal notranslate"><span class="pre">.collect()</span></code> sobre las 1,8 millones o 452 mil filas. La matriz de confusión de cada modelo se calcula con una agregación distribuida (<code class="docutils literal notranslate"><span class="pre">groupBy(\&quot;default\&quot;,\&quot;pred_label\&quot;).count()</span></code>) que solo trae 4 números al driver, y los puntajes de prueba de los 6 modelos se escriben primero con <code class="docutils literal notranslate"><span class="pre">DataFrame.write.parquet(...)</span></code> y después se leen con pandas desde ese archivo ya guardado en disco, nunca directamente desde el DataFrame de Spark en memoria.</p>
+<p>El script completo (<code class="docutils literal notranslate"><span class="pre">src/model_pyspark.py</span></code>) tardó alrededor de 4 horas y 9 minutos, dominado por <code class="docutils literal notranslate"><span class="pre">RandomForestClassifier</span></code> (177 minutos) y <code class="docutils literal notranslate"><span class="pre">GBTClassifier</span></code> (49 minutos). Por la misma razón que en la sección 3, este notebook documenta el código exacto que usamos (como bloques de referencia) y carga los resultados y puntajes ya calculados para hacer el análisis.</p>
+<section id="carga-de-resultados-y-puntajes-guardados">
+<h2>4.1. Carga de resultados y puntajes guardados<a class="headerlink" href="#carga-de-resultados-y-puntajes-guardados" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">roc_curve</span><span class="p">,</span> <span class="n">auc</span><span class="p">,</span> <span class="n">confusion_matrix</span>
+
+<span class="n">results_spark</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">"../outputs/tables/spark_results.csv"</span><span class="p">)</span>
+<span class="n">scores_spark</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="s2">"../data/spark_test_scores.parquet"</span><span class="p">)</span>
+<span class="n">results_sklearn</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">"../outputs/tables/sklearn_results.csv"</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"../outputs/tables/hardware_spark.json"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">hardware_spark</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="n">y_test</span> <span class="o">=</span> <span class="n">scores_spark</span><span class="p">[</span><span class="s2">"default"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Hardware usado (misma maquina fisica que scikit-learn):"</span><span class="p">,</span> <span class="n">hardware_spark</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Conjunto de prueba: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">y_test</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> filas"</span><span class="p">)</span>
+
+<span class="c1"># Verificacion critica: mismo conjunto de prueba (mismas 452,141 filas) que en scikit-learn --</span>
+<span class="c1"># indispensable para que la prueba de DeLong (seccion 5) compare pares validos.</span>
+<span class="n">scores_sklearn</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="s2">"../data/sklearn_test_scores.parquet"</span><span class="p">)</span>
+<span class="n">mismas_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">scores_spark</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">scores_sklearn</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Mismo conjunto de test que scikit-learn (mismos ids): </span><span class="si">{</span><span class="n">mismas_ids</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Hardware usado (misma maquina fisica que scikit-learn): {'cores': 2, 'ram_gb': 7.8, 'nota': 'misma maquina fisica que scikit-learn; Spark en local[2]'}
+Conjunto de prueba: 452,141 filas
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Mismo conjunto de test que scikit-learn (mismos ids): True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="modelo-por-modelo-malla-de-hiperparametros-y-equivalencias-con-scikit-learn">
+<h2>4.2. Modelo por modelo: malla de hiperparámetros y equivalencias con scikit-learn<a class="headerlink" href="#modelo-por-modelo-malla-de-hiperparametros-y-equivalencias-con-scikit-learn" title="Link to this heading">#</a></h2>
+<p>Código de referencia que usamos en <code class="docutils literal notranslate"><span class="pre">src/model_pyspark.py</span></code>.</p>
+<section id="regresion-logistica">
+<h3>4.2.1. Regresión logística<a class="headerlink" href="#regresion-logistica" title="Link to this heading">#</a></h3>
+<p>El <code class="docutils literal notranslate"><span class="pre">regParam</span></code> de Spark ya es directamente equivalente al <code class="docutils literal notranslate"><span class="pre">alpha</span></code> que usamos en la fórmula <code class="docutils literal notranslate"><span class="pre">C=1/(alpha·n)</span></code> de scikit-learn, porque Spark minimiza la pérdida promedio más <code class="docutils literal notranslate"><span class="pre">regParam</span></code> por la penalización, mientras que sklearn minimiza la pérdida total más <code class="docutils literal notranslate"><span class="pre">(1/C)</span></code> por la penalización, y como <code class="docutils literal notranslate"><span class="pre">1/C</span> <span class="pre">=</span> <span class="pre">alpha·n</span></code>, las dos formulaciones terminan siendo equivalentes con los mismos valores de <code class="docutils literal notranslate"><span class="pre">alpha</span> <span class="pre">=</span> <span class="pre">regParam</span></code>. Por eso usamos la misma malla de valores (1e-6, 1e-5, 1e-4) sin tener que reescalarla por <code class="docutils literal notranslate"><span class="pre">n_train</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">lr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">featuresCol</span><span class="o">=</span>\<span class="s2">"features</span><span class="se">\"</span><span class="s2">, labelCol=</span><span class="se">\"</span><span class="s2">default</span><span class="se">\"</span><span class="s2">)</span><span class="se">\n</span><span class="s2">grid = ParamGridBuilder().addGrid(lr.regParam, [1e-6, 1e-5, 1e-4]).build()</span><span class="se">\n</span><span class="s2">cv = CrossValidator(estimator=lr, estimatorParamMaps=grid, evaluator=evaluator_auc,</span><span class="se">\n</span><span class="s2">                     numFolds=3, parallelism=1, seed=42)</span><span class="se">\n</span><span class="s2">cv_model = cv.fit(train)</span>
+</pre></div>
+</div>
+</section>
+<section id="arbol-de-decision">
+<h3>4.2.2. Árbol de decisión<a class="headerlink" href="#arbol-de-decision" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dt</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">featuresCol</span><span class="o">=</span>\<span class="s2">"features</span><span class="se">\"</span><span class="s2">, labelCol=</span><span class="se">\"</span><span class="s2">default</span><span class="se">\"</span><span class="s2">, seed=42)</span><span class="se">\n</span><span class="s2">grid = ParamGridBuilder().addGrid(dt.maxDepth, [5, 10, 15]).build()</span>
+</pre></div>
+</div>
+<p>En la primera corrida de este modelo cometimos un error: usamos la columna <code class="docutils literal notranslate"><span class="pre">rawPrediction</span></code> (los conteos de clase sin normalizar de la hoja donde cae cada fila) tanto para elegir el mejor <code class="docutils literal notranslate"><span class="pre">maxDepth</span></code> por validación cruzada como para calcular el AUC de prueba, en vez de usar <code class="docutils literal notranslate"><span class="pre">probability</span></code> (esos mismos conteos pero normalizados), que es la columna que de verdad guardamos y usamos en el resto del análisis. Para los otros 5 modelos esto no cambia nada, porque ahí <code class="docutils literal notranslate"><span class="pre">rawPrediction</span></code> y <code class="docutils literal notranslate"><span class="pre">probability</span></code> conservan el mismo orden entre filas. Pero en un árbol de decisión individual, dos hojas distintas pueden tener un número total de observaciones muy distinto, así que un conteo alto en una hoja grande puede corresponder en realidad a una probabilidad menor que un conteo bajo en una hoja pequeña. <code class="docutils literal notranslate"><span class="pre">rawPrediction</span></code> y <code class="docutils literal notranslate"><span class="pre">probability</span></code> no son intercambiables en este caso.</p>
+<p>Corregimos esto reentrenando el modelo con un evaluador que usa <code class="docutils literal notranslate"><span class="pre">probability</span></code> de forma consistente en las dos etapas (<code class="docutils literal notranslate"><span class="pre">src/fix_decisiontree_spark.py</span></code>), y el resultado cambió bastante: la validación cruzada ya no elige <code class="docutils literal notranslate"><span class="pre">maxDepth=10</span></code> sino <code class="docutils literal notranslate"><span class="pre">maxDepth=15</span></code>, y el AUC de prueba sube de 0,598 a 0,720. Este error nos enseñó algo importante: la columna de puntaje que se usa para optimizar los hiperparámetros no es un detalle sin importancia, puede cambiar completamente qué modelo termina eligiéndose como el mejor.</p>
+</section>
+<section id="bosque-aleatorio-el-mas-costoso-tambien-en-spark">
+<h3>4.2.3. Bosque aleatorio, el más costoso también en Spark<a class="headerlink" href="#bosque-aleatorio-el-mas-costoso-tambien-en-spark" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">featuresCol</span><span class="o">=</span>\<span class="s2">"features</span><span class="se">\"</span><span class="s2">, labelCol=</span><span class="se">\"</span><span class="s2">default</span><span class="se">\"</span><span class="s2">, seed=42)</span><span class="se">\n</span><span class="s2">grid = (ParamGridBuilder().addGrid(rf.numTrees, [10, 50, 100])</span><span class="se">\n</span><span class="s2">                           .addGrid(rf.maxDepth, [5, 10, 15]).build())</span>
+</pre></div>
+</div>
+<p>Usamos exactamente la misma malla que en scikit-learn (9 combinaciones por 3 pliegues, más el reentrenamiento final, 28 ajustes en total). Esto tardó 10.597 segundos, casi 177 minutos, más que los 6.739 segundos (112 minutos) que tomó en scikit-learn con <code class="docutils literal notranslate"><span class="pre">n_jobs=1</span></code>. Esto tiene que ver con lo que explicamos en la sección 4.7: el paralelismo distribuido de Spark tiene un costo fijo de coordinación que, en un clúster de solo 2 núcleos, pesa más que el beneficio de paralelizar.</p>
+</section>
+<section id="gradient-boosting-gbtclassifier-nativo-sin-necesidad-de-sustituirlo">
+<h3>4.2.4. Gradient Boosting (<code class="docutils literal notranslate"><span class="pre">GBTClassifier</span></code> nativo, sin necesidad de sustituirlo)<a class="headerlink" href="#gradient-boosting-gbtclassifier-nativo-sin-necesidad-de-sustituirlo" title="Link to this heading">#</a></h3>
+<p>A diferencia de scikit-learn, aquí no hace falta sustituir nada: <code class="docutils literal notranslate"><span class="pre">GBTClassifier</span></code> de Spark ya implementa boosting con particionamiento eficiente de forma nativa.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">gbt</span> <span class="o">=</span> <span class="n">GBTClassifier</span><span class="p">(</span><span class="n">featuresCol</span><span class="o">=</span>\<span class="s2">"features</span><span class="se">\"</span><span class="s2">, labelCol=</span><span class="se">\"</span><span class="s2">default</span><span class="se">\"</span><span class="s2">, seed=42)</span><span class="se">\n</span><span class="s2">grid = ParamGridBuilder().addGrid(gbt.maxIter, [50, 100]).addGrid(gbt.maxDepth, [3, 5]).build()</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">maxIter</span></code> es el equivalente directo de <code class="docutils literal notranslate"><span class="pre">max_iter</span></code> en <code class="docutils literal notranslate"><span class="pre">HistGradientBoostingClassifier</span></code>. Nos pareció curioso que la combinación ganadora (<code class="docutils literal notranslate"><span class="pre">maxIter=100,</span> <span class="pre">maxDepth=5</span></code>) fuera exactamente la misma que escogió <code class="docutils literal notranslate"><span class="pre">HistGradientBoostingClassifier</span></code> en scikit-learn.</p>
+</section>
+<section id="svm-lineal">
+<h3>4.2.5. SVM lineal<a class="headerlink" href="#svm-lineal" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code> de Spark siempre usa pérdida hinge, no existe la opción <code class="docutils literal notranslate"><span class="pre">squared_hinge</span></code>. Por esto mismo, del lado de scikit-learn forzamos <code class="docutils literal notranslate"><span class="pre">loss=\&quot;hinge\&quot;</span></code> en vez de usar el valor por defecto, para que la comparación fuera justa.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">svc</span> <span class="o">=</span> <span class="n">LinearSVC</span><span class="p">(</span><span class="n">featuresCol</span><span class="o">=</span>\<span class="s2">"features</span><span class="se">\"</span><span class="s2">, labelCol=</span><span class="se">\"</span><span class="s2">default</span><span class="se">\"</span><span class="s2">)</span><span class="se">\n</span><span class="s2">grid = ParamGridBuilder().addGrid(svc.regParam, [1e-6, 1e-5, 1e-4]).build()</span>
+</pre></div>
+</div>
+<p>El resultado acá es uno de los hallazgos más interesantes de todo el proyecto, que explicamos en la sección 4.6: con el mismo tipo de pérdida y una malla de regularización equivalente, Spark no reproduce el colapso a clasificador constante que sí vimos en scikit-learn.</p>
+</section>
+<section id="naive-bayes-gaussiano">
+<h3>4.2.6. Naive Bayes (gaussiano)<a class="headerlink" href="#naive-bayes-gaussiano" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nb_model</span> <span class="o">=</span> <span class="n">NaiveBayes</span><span class="p">(</span><span class="n">featuresCol</span><span class="o">=</span>\<span class="s2">"features</span><span class="se">\"</span><span class="s2">, labelCol=</span><span class="se">\"</span><span class="s2">default</span><span class="se">\"</span><span class="s2">, modelType=</span><span class="se">\"</span><span class="s2">gaussian</span><span class="se">\"</span><span class="s2">)</span><span class="se">\n</span><span class="s2">grid = ParamGridBuilder().build()  # sin busqueda de hiperparametros, igual que en sklearn</span>
+</pre></div>
+</div>
+<p>Usamos <code class="docutils literal notranslate"><span class="pre">modelType=\&quot;gaussian\&quot;</span></code> (no <code class="docutils literal notranslate"><span class="pre">\&quot;multinomial\&quot;</span></code> ni <code class="docutils literal notranslate"><span class="pre">\&quot;bernoulli\&quot;</span></code>) por la misma razón que en scikit-learn: las variables numéricas, al estar escaladas con <code class="docutils literal notranslate"><span class="pre">StandardScaler</span></code>, toman valores negativos, y los otros dos tipos de Naive Bayes de Spark no los admiten.</p>
+</section>
+</section>
+<section id="tabla-comparativa-final-pyspark">
+<h2>4.3. Tabla comparativa final (PySpark)<a class="headerlink" href="#tabla-comparativa-final-pyspark" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cols_show</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"modelo"</span><span class="p">,</span><span class="s2">"best_params"</span><span class="p">,</span><span class="s2">"cv_auc"</span><span class="p">,</span><span class="s2">"test_auc"</span><span class="p">,</span><span class="s2">"test_accuracy"</span><span class="p">,</span>
+             <span class="s2">"test_precision"</span><span class="p">,</span><span class="s2">"test_recall"</span><span class="p">,</span><span class="s2">"test_f1"</span><span class="p">,</span><span class="s2">"tiempo_entrenamiento_s"</span><span class="p">,</span><span class="s2">"tiempo_prediccion_s"</span><span class="p">]</span>
+<span class="n">tabla_spark</span> <span class="o">=</span> <span class="n">results_spark</span><span class="p">[</span><span class="n">cols_show</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">"test_auc"</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">tabla_spark_fmt</span> <span class="o">=</span> <span class="n">tabla_spark</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"cv_auc"</span><span class="p">,</span><span class="s2">"test_auc"</span><span class="p">,</span><span class="s2">"test_accuracy"</span><span class="p">,</span><span class="s2">"test_precision"</span><span class="p">,</span><span class="s2">"test_recall"</span><span class="p">,</span><span class="s2">"test_f1"</span><span class="p">]:</span>
+    <span class="n">tabla_spark_fmt</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">tabla_spark_fmt</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">tabla_spark_fmt</span><span class="p">[</span><span class="s2">"tiempo_entrenamiento_s"</span><span class="p">]</span> <span class="o">=</span> <span class="n">tabla_spark_fmt</span><span class="p">[</span><span class="s2">"tiempo_entrenamiento_s"</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">tabla_spark_fmt</span><span class="p">[</span><span class="s2">"tiempo_prediccion_s"</span><span class="p">]</span> <span class="o">=</span> <span class="n">tabla_spark_fmt</span><span class="p">[</span><span class="s2">"tiempo_prediccion_s"</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">tabla_spark_fmt</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>modelo</th>
+      <th>best_params</th>
+      <th>cv_auc</th>
+      <th>test_auc</th>
+      <th>test_accuracy</th>
+      <th>test_precision</th>
+      <th>test_recall</th>
+      <th>test_f1</th>
+      <th>tiempo_entrenamiento_s</th>
+      <th>tiempo_prediccion_s</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>GBT</td>
+      <td>{"maxIter": 100, "maxDepth": 5}</td>
+      <td>0.7299</td>
+      <td>0.7327</td>
+      <td>0.8812</td>
+      <td>0.4959</td>
+      <td>0.0045</td>
+      <td>0.0089</td>
+      <td>2950.2</td>
+      <td>12.96</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>LogisticRegression</td>
+      <td>{"regParam": 1e-06}</td>
+      <td>0.7248</td>
+      <td>0.7232</td>
+      <td>0.8802</td>
+      <td>0.3815</td>
+      <td>0.0133</td>
+      <td>0.0258</td>
+      <td>274.7</td>
+      <td>5.60</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>DecisionTree</td>
+      <td>{"maxDepth": 15}</td>
+      <td>0.7144</td>
+      <td>0.7204</td>
+      <td>0.8762</td>
+      <td>0.2004</td>
+      <td>0.0140</td>
+      <td>0.0262</td>
+      <td>255.7</td>
+      <td>3.97</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>RandomForest</td>
+      <td>{"numTrees": 100, "maxDepth": 15}</td>
+      <td>0.7184</td>
+      <td>0.7185</td>
+      <td>0.8812</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>10597.1</td>
+      <td>113.77</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>LinearSVC</td>
+      <td>{"regParam": 1e-06}</td>
+      <td>0.6755</td>
+      <td>0.7037</td>
+      <td>0.8812</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>567.4</td>
+      <td>5.16</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>NaiveBayes</td>
+      <td>{}</td>
+      <td>0.6998</td>
+      <td>0.6989</td>
+      <td>0.7869</td>
+      <td>0.2432</td>
+      <td>0.3759</td>
+      <td>0.2953</td>
+      <td>49.1</td>
+      <td>5.84</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Por AUC de prueba, el orden en Spark queda así: <code class="docutils literal notranslate"><span class="pre">GBT</span></code> (0,733), <code class="docutils literal notranslate"><span class="pre">LogisticRegression</span></code> (0,723), <code class="docutils literal notranslate"><span class="pre">DecisionTree</span></code> (0,720), <code class="docutils literal notranslate"><span class="pre">RandomForest</span></code> (0,719), <code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code> (0,704) y <code class="docutils literal notranslate"><span class="pre">NaiveBayes</span></code> (0,699). El mejor modelo, igual que en scikit-learn, es el de boosting con histogramas, aunque aquí con una ventaja menos amplia sobre los demás. Los valores de <code class="docutils literal notranslate"><span class="pre">DecisionTree</span></code> y <code class="docutils literal notranslate"><span class="pre">NaiveBayes</span></code> en esta tabla ya incluyen las dos correcciones que explicamos en la sección 4.6.</p>
+</section>
+<section id="curvas-roc-los-6-modelos-superpuestos">
+<h2>4.4. Curvas ROC (los 6 modelos superpuestos)<a class="headerlink" href="#curvas-roc-los-6-modelos-superpuestos" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">score_cols_spark</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"LogisticRegression"</span><span class="p">:</span> <span class="s2">"score_LogisticRegression"</span><span class="p">,</span>
+    <span class="s2">"DecisionTree"</span><span class="p">:</span> <span class="s2">"score_DecisionTree"</span><span class="p">,</span>
+    <span class="s2">"RandomForest"</span><span class="p">:</span> <span class="s2">"score_RandomForest"</span><span class="p">,</span>
+    <span class="s2">"GBT"</span><span class="p">:</span> <span class="s2">"score_GBT"</span><span class="p">,</span>
+    <span class="s2">"LinearSVC"</span><span class="p">:</span> <span class="s2">"score_LinearSVC"</span><span class="p">,</span>
+    <span class="s2">"NaiveBayes"</span><span class="p">:</span> <span class="s2">"score_NaiveBayes"</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">score_cols_spark</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">roc_curve</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">scores_spark</span><span class="p">[</span><span class="n">col</span><span class="p">])</span>
+    <span class="n">roc_auc</span> <span class="o">=</span> <span class="n">auc</span><span class="p">(</span><span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">nombre</span><span class="si">}</span><span class="s2"> (AUC=</span><span class="si">{</span><span class="n">roc_auc</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">)"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.8</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Azar (AUC=0.5)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Tasa de falsos positivos"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Tasa de verdaderos positivos"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Curvas ROC — PySpark (conjunto de prueba)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">"lower right"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">"../outputs/figures/eda/roc_spark.png"</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">110</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/050fba326e93c8e441ed2da4aced71a5f72cc52aa8d4f511869c9955c9de21bb.png" src="_images/050fba326e93c8e441ed2da4aced71a5f72cc52aa8d4f511869c9955c9de21bb.png" />
+</div>
+</div>
+</section>
+<section id="matrices-de-confusion-umbral-natural-0-5-de-probabilidad-o-margen-0">
+<h2>4.5. Matrices de confusión (umbral natural: 0,5 de probabilidad, o margen 0)<a class="headerlink" href="#matrices-de-confusion-umbral-natural-0-5-de-probabilidad-o-margen-0" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="p">(</span><span class="n">nombre</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="o">.</span><span class="n">flat</span><span class="p">,</span> <span class="n">score_cols_spark</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+    <span class="k">if</span> <span class="n">nombre</span> <span class="o">==</span> <span class="s2">"LinearSVC"</span><span class="p">:</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="p">(</span><span class="n">scores_spark</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="p">(</span><span class="n">scores_spark</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">cm</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"Greens"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">cm</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="s2">"white"</span> <span class="k">if</span> <span class="n">cm</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">cm</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span> <span class="k">else</span> <span class="s2">"black"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="s2">"No default"</span><span class="p">,</span><span class="s2">"Default"</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="s2">"No default"</span><span class="p">,</span><span class="s2">"Default"</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">nombre</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Predicho"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Real"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">"../outputs/figures/eda/confusion_spark.png"</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">110</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/a7a3bbd374258d9026c01977ee2ac91e191d5d48b9d74e38977d9ba8e64722f5.png" src="_images/a7a3bbd374258d9026c01977ee2ac91e191d5d48b9d74e38977d9ba8e64722f5.png" />
+</div>
+</div>
+</section>
+<section id="tres-hallazgos-que-solo-aparecen-al-comparar-con-scikit-learn">
+<h2>4.6. Tres hallazgos que solo aparecen al comparar con scikit-learn<a class="headerlink" href="#tres-hallazgos-que-solo-aparecen-al-comparar-con-scikit-learn" title="Link to this heading">#</a></h2>
+<section id="a-el-arbol-de-decision-sigue-rindiendo-algo-peor-en-spark-incluso-ya-corregido-auc-0-720-contra-0-737">
+<h3>(a) El árbol de decisión sigue rindiendo algo peor en Spark, incluso ya corregido (AUC 0,720 contra 0,737)<a class="headerlink" href="#a-el-arbol-de-decision-sigue-rindiendo-algo-peor-en-spark-incluso-ya-corregido-auc-0-720-contra-0-737" title="Link to this heading">#</a></h3>
+<p>Después de corregir el error de la sección 4.2.2 (usar <code class="docutils literal notranslate"><span class="pre">probability</span></code> en vez de <code class="docutils literal notranslate"><span class="pre">rawPrediction</span></code>), la diferencia se reduce bastante, de 14 puntos de AUC a menos de 2, y además cada entorno elige una profundidad distinta como la mejor (<code class="docutils literal notranslate"><span class="pre">maxDepth=15</span></code> en Spark, <code class="docutils literal notranslate"><span class="pre">maxDepth=10</span></code> en scikit-learn). Esto nos dice que las dos implementaciones no son idénticas. Lo que queda de diferencia probablemente viene de <code class="docutils literal notranslate"><span class="pre">maxBins</span></code> (32 por defecto en <code class="docutils literal notranslate"><span class="pre">DecisionTreeClassifier</span></code> de Spark): las variables continuas se discretizan en como máximo 32 puntos de corte candidatos antes de buscar la mejor división, mientras que scikit-learn evalúa cualquier punto de corte real entre valores consecutivos. A diferencia de lo que pensamos al principio, esto ya no explica una brecha grande, porque la mayor parte de la diferencia que veíamos al inicio era en realidad el error de la columna de puntaje, no una diferencia real entre algoritmos.</p>
+</section>
+<section id="b-linearsvc-no-colapsa-en-spark-auc-0-704-contra-0-559-en-scikit-learn">
+<h3>(b) <code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code> no colapsa en Spark (AUC 0,704 contra 0,559 en scikit-learn)<a class="headerlink" href="#b-linearsvc-no-colapsa-en-spark-auc-0-704-contra-0-559-en-scikit-learn" title="Link to this heading">#</a></h3>
+<p>Los dos entornos usan pérdida hinge y una malla de regularización equivalente, pero scikit-learn escogió la regularización más fuerte disponible en su malla (la misma que, según vimos en el diagnóstico de la sección 3.7, empuja al modelo a colapsar hacia “no default” para todo el mundo), mientras que Spark escogió la regularización más débil de la misma malla, y sus puntajes mantienen una dispersión real en vez de quedar casi constantes. Esto sugiere que el optimizador de Spark (OWL-QN) recorre la superficie de pérdida de forma distinta al <code class="docutils literal notranslate"><span class="pre">liblinear</span></code> de scikit-learn, y para este problema tan desbalanceado, no queda atrapado en la misma solución degenerada. Vale la pena aclarar que, al umbral natural (margen=0), los dos entornos igual predicen 0 casos positivos. La diferencia real está en la calidad del ranking que mide el AUC, no en el comportamiento a ese umbral por defecto.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">"scikit-learn LinearSVC — mejor C:"</span><span class="p">,</span> <span class="n">results_sklearn</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">results_sklearn</span><span class="o">.</span><span class="n">modelo</span><span class="o">==</span><span class="s1">'LinearSVC'</span><span class="p">,</span><span class="s1">'best_params'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"PySpark      LinearSVC — mejor regParam:"</span><span class="p">,</span> <span class="n">results_spark</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">results_spark</span><span class="o">.</span><span class="n">modelo</span><span class="o">==</span><span class="s1">'LinearSVC'</span><span class="p">,</span><span class="s1">'best_params'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"scikit-learn LinearSVC — score en prueba: min=</span><span class="si">%.4f</span><span class="s2"> max=</span><span class="si">%.4f</span><span class="s2"> std=</span><span class="si">%.6f</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span>
+    <span class="n">scores_sklearn</span><span class="p">[</span><span class="s1">'score_LinearSVC'</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">scores_sklearn</span><span class="p">[</span><span class="s1">'score_LinearSVC'</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">scores_sklearn</span><span class="p">[</span><span class="s1">'score_LinearSVC'</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"PySpark      LinearSVC — score en prueba: min=</span><span class="si">%.4f</span><span class="s2"> max=</span><span class="si">%.4f</span><span class="s2"> std=</span><span class="si">%.6f</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span>
+    <span class="n">scores_spark</span><span class="p">[</span><span class="s1">'score_LinearSVC'</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">scores_spark</span><span class="p">[</span><span class="s1">'score_LinearSVC'</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">scores_spark</span><span class="p">[</span><span class="s1">'score_LinearSVC'</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>scikit-learn LinearSVC — mejor C: {"C": 0.05529260848409784}
+PySpark      LinearSVC — mejor regParam: {"regParam": 1e-06}
+
+scikit-learn LinearSVC — score en prueba: min=-1.0000 max=-1.0000 std=0.000000
+PySpark      LinearSVC — score en prueba: min=-1.3426 max=-0.9977 std=0.058776
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="c-naive-bayes-el-mismo-error-que-en-a-no-una-diferencia-real-entre-librerias">
+<h3>(c) Naive Bayes: el mismo error que en (a), no una diferencia real entre librerías<a class="headerlink" href="#c-naive-bayes-el-mismo-error-que-en-a-no-una-diferencia-real-entre-librerias" title="Link to this heading">#</a></h3>
+<p>En la primera versión de esta sección, Naive Bayes de Spark aparecía muy por debajo de scikit-learn (AUC 0,564 contra 0,694), y en un primer momento pensamos que se debía a diferencias en cómo cada librería suaviza la varianza. Esa comparación estaba mal por la misma razón que el árbol de decisión en (a): <code class="docutils literal notranslate"><span class="pre">NaiveBayesModel</span></code> no tiene hiperparámetros que ajustar, pero el AUC que reportábamos igual se calculó con la columna <code class="docutils literal notranslate"><span class="pre">rawPrediction</span></code>, mientras que el puntaje que realmente guardamos y usamos en la matriz de confusión viene de la columna <code class="docutils literal notranslate"><span class="pre">probability</span></code>. Para este modelo esas dos columnas tampoco son equivalentes en cuanto al orden que producen. Al recalcular con el evaluador correcto (<code class="docutils literal notranslate"><span class="pre">src/fix_naivebayes_spark.py</span></code>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cv_auc</span><span class="p">:</span>   <span class="mf">0.5644</span>  <span class="o">-&gt;</span>  <span class="mf">0.6998</span>\<span class="n">ntest_auc</span><span class="p">:</span> <span class="mf">0.5643</span>  <span class="o">-&gt;</span>  <span class="mf">0.6989</span>
+</pre></div>
+</div>
+<p>Con el número correcto, Naive Bayes en Spark queda prácticamente empatado con <code class="docutils literal notranslate"><span class="pre">GaussianNB</span></code> de scikit-learn (0,699 contra 0,694). No hay ninguna diferencia real de implementación que explicar aquí. La lección se repite y se refuerza: conviene revisar, modelo por modelo, que la columna de puntaje que se usa para evaluar coincide con la que realmente se usa en el resto del pipeline, en vez de asumirlo según el tipo de modelo.</p>
+</section>
+</section>
+<section id="costo-computacional-scikit-learn-contra-pyspark-modelo-por-modelo">
+<h2>4.7. Costo computacional: scikit-learn contra PySpark, modelo por modelo<a class="headerlink" href="#costo-computacional-scikit-learn-contra-pyspark-modelo-por-modelo" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">comparacion_tiempo</span> <span class="o">=</span> <span class="n">results_sklearn</span><span class="p">[[</span><span class="s2">"modelo"</span><span class="p">,</span><span class="s2">"tiempo_entrenamiento_s"</span><span class="p">,</span><span class="s2">"test_auc"</span><span class="p">]]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+    <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">"tiempo_entrenamiento_s"</span><span class="p">:</span><span class="s2">"tiempo_sklearn_s"</span><span class="p">,</span><span class="s2">"test_auc"</span><span class="p">:</span><span class="s2">"auc_sklearn"</span><span class="p">})</span>
+<span class="n">mapa_nombres</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"GBT_HistGB"</span><span class="p">:</span> <span class="s2">"GBT"</span><span class="p">}</span>  <span class="c1"># normalizar nombre para el cruce</span>
+<span class="n">tmp</span> <span class="o">=</span> <span class="n">results_spark</span><span class="p">[[</span><span class="s2">"modelo"</span><span class="p">,</span><span class="s2">"tiempo_entrenamiento_s"</span><span class="p">,</span><span class="s2">"test_auc"</span><span class="p">]]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+    <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">"tiempo_entrenamiento_s"</span><span class="p">:</span><span class="s2">"tiempo_spark_s"</span><span class="p">,</span><span class="s2">"test_auc"</span><span class="p">:</span><span class="s2">"auc_spark"</span><span class="p">})</span>
+<span class="n">comparacion_tiempo</span><span class="p">[</span><span class="s2">"modelo_join"</span><span class="p">]</span> <span class="o">=</span> <span class="n">comparacion_tiempo</span><span class="p">[</span><span class="s2">"modelo"</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">mapa_nombres</span><span class="p">)</span>
+<span class="n">comparacion_tiempo</span> <span class="o">=</span> <span class="n">comparacion_tiempo</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s2">"modelo_join"</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="s2">"modelo"</span><span class="p">,</span> <span class="n">suffixes</span><span class="o">=</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span><span class="s2">"_2"</span><span class="p">))</span>
+<span class="n">comparacion_tiempo</span><span class="p">[</span><span class="s2">"mas_rapido"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">comparacion_tiempo</span><span class="p">[</span><span class="s2">"tiempo_sklearn_s"</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">comparacion_tiempo</span><span class="p">[</span><span class="s2">"tiempo_spark_s"</span><span class="p">],</span>
+                                              <span class="s2">"scikit-learn"</span><span class="p">,</span> <span class="s2">"PySpark"</span><span class="p">)</span>
+<span class="n">comparacion_tiempo</span><span class="p">[</span><span class="s2">"razon_veces"</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">comparacion_tiempo</span><span class="p">[[</span><span class="s2">"tiempo_sklearn_s"</span><span class="p">,</span><span class="s2">"tiempo_spark_s"</span><span class="p">]]</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span>
+                                      <span class="n">comparacion_tiempo</span><span class="p">[[</span><span class="s2">"tiempo_sklearn_s"</span><span class="p">,</span><span class="s2">"tiempo_spark_s"</span><span class="p">]]</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">tabla_final</span> <span class="o">=</span> <span class="n">comparacion_tiempo</span><span class="p">[[</span><span class="s2">"modelo"</span><span class="p">,</span><span class="s2">"tiempo_sklearn_s"</span><span class="p">,</span><span class="s2">"tiempo_spark_s"</span><span class="p">,</span><span class="s2">"mas_rapido"</span><span class="p">,</span><span class="s2">"razon_veces"</span><span class="p">,</span><span class="s2">"auc_sklearn"</span><span class="p">,</span><span class="s2">"auc_spark"</span><span class="p">]]</span>
+<span class="n">tabla_final</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>modelo</th>
+      <th>tiempo_sklearn_s</th>
+      <th>tiempo_spark_s</th>
+      <th>mas_rapido</th>
+      <th>razon_veces</th>
+      <th>auc_sklearn</th>
+      <th>auc_spark</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>LogisticRegression</td>
+      <td>70.44</td>
+      <td>274.68</td>
+      <td>scikit-learn</td>
+      <td>3.90</td>
+      <td>0.72</td>
+      <td>0.72</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>DecisionTree</td>
+      <td>509.06</td>
+      <td>255.74</td>
+      <td>PySpark</td>
+      <td>1.99</td>
+      <td>0.74</td>
+      <td>0.72</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>RandomForest</td>
+      <td>6739.25</td>
+      <td>10597.08</td>
+      <td>scikit-learn</td>
+      <td>1.57</td>
+      <td>0.72</td>
+      <td>0.72</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>GBT_HistGB</td>
+      <td>600.44</td>
+      <td>2950.21</td>
+      <td>scikit-learn</td>
+      <td>4.91</td>
+      <td>0.74</td>
+      <td>0.73</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>LinearSVC</td>
+      <td>4838.67</td>
+      <td>567.44</td>
+      <td>PySpark</td>
+      <td>8.53</td>
+      <td>0.56</td>
+      <td>0.70</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">total_sklearn</span> <span class="o">=</span> <span class="n">results_sklearn</span><span class="p">[</span><span class="s2">"tiempo_entrenamiento_s"</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">total_spark</span> <span class="o">=</span> <span class="n">results_spark</span><span class="p">[</span><span class="s2">"tiempo_entrenamiento_s"</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Tiempo TOTAL de entrenamiento (6 modelos): scikit-learn=</span><span class="si">{</span><span class="n">total_sklearn</span><span class="si">:</span><span class="s2">,.1f</span><span class="si">}</span><span class="s2">s (~</span><span class="si">{</span><span class="n">total_sklearn</span><span class="o">/</span><span class="mi">60</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> min) "</span>
+      <span class="sa">f</span><span class="s2">"| PySpark=</span><span class="si">{</span><span class="n">total_spark</span><span class="si">:</span><span class="s2">,.1f</span><span class="si">}</span><span class="s2">s (~</span><span class="si">{</span><span class="n">total_spark</span><span class="o">/</span><span class="mi">60</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> min)"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"scikit-learn fue </span><span class="si">{</span><span class="n">total_spark</span><span class="o">/</span><span class="n">total_sklearn</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">x mas rapido en total."</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Tiempo TOTAL de entrenamiento (6 modelos): scikit-learn=12,761.4s (~212.7 min) | PySpark=14,694.3s (~244.9 min)
+scikit-learn fue 1.15x mas rapido en total.
+</pre></div>
+</div>
+</div>
+</div>
+<p>scikit-learn resultó más rápido en el total (unas 3 horas 33 minutos contra 4 horas 4 minutos), y gana claramente en 4 de los 6 modelos individuales (regresión logística, bosque aleatorio, boosting y Naive Bayes). Esto tiene sentido en una máquina de solo 2 núcleos: el paralelismo distribuido de Spark no tiene margen para compensar su propio costo fijo de coordinación, que se amortiza mejor en un clúster real con muchos más núcleos. <code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code> es la única excepción clara: ahí Spark fue 8,5 veces más rápido y con mejor AUC, pero principalmente porque en scikit-learn ese modelo colapsó a una solución degenerada que, aun así, seguía siendo cara de calcular. <code class="docutils literal notranslate"><span class="pre">DecisionTree</span></code>, ya con el error de la sección 4.2.2 corregido, también fue cerca de 2 veces más rápido en Spark, con un AUC apenas 1,7 puntos por debajo del de scikit-learn. Esta sí es una ventaja razonablemente limpia para Spark, aunque bastante más modesta que la de <code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code>.</p>
+<p>Esto responde directamente a una de las preguntas que nos hacíamos al principio: con este hardware, PySpark no llegó a superar a scikit-learn en velocidad total en este proyecto. La ventaja de Spark aparecería con datasets mucho más grandes, que no entren en la memoria de una sola máquina, o con un clúster de varios nodos donde sí haya paralelismo real que aprovechar.</p>
+</section>
+<section id="sintesis-mejor-modelo-del-entorno-pyspark">
+<h2>4.8. Síntesis: mejor modelo del entorno PySpark<a class="headerlink" href="#sintesis-mejor-modelo-del-entorno-pyspark" title="Link to this heading">#</a></h2>
+<p>Por AUC de prueba, <code class="docutils literal notranslate"><span class="pre">GBTClassifier</span></code> (0,733) es el mejor modelo de este entorno, igual que en scikit-learn: un método de boosting con histogramas es el que mejor equilibra desempeño y costo. Este modelo (guardado en <code class="docutils literal notranslate"><span class="pre">data/spark_best_model_GBT</span></code>) es el que usamos más adelante para la interpretabilidad con LIME, y los puntajes de los 6 modelos en <code class="docutils literal notranslate"><span class="pre">data/spark_test_scores.parquet</span></code>, calculados sobre exactamente las mismas 452.141 filas de prueba que en scikit-learn, son la base de las comparaciones estadísticas de las secciones 5 y 6.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="03_modelado_sklearn.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">3. Modelado con scikit-learn</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="05_delong.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">5. Prueba de DeLong con corrección de Holm</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#carga-de-resultados-y-puntajes-guardados">4.1. Carga de resultados y puntajes guardados</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modelo-por-modelo-malla-de-hiperparametros-y-equivalencias-con-scikit-learn">4.2. Modelo por modelo: malla de hiperparámetros y equivalencias con scikit-learn</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#regresion-logistica">4.2.1. Regresión logística</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arbol-de-decision">4.2.2. Árbol de decisión</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bosque-aleatorio-el-mas-costoso-tambien-en-spark">4.2.3. Bosque aleatorio, el más costoso también en Spark</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gradient-boosting-gbtclassifier-nativo-sin-necesidad-de-sustituirlo">4.2.4. Gradient Boosting (<code class="docutils literal notranslate"><span class="pre">GBTClassifier</span></code> nativo, sin necesidad de sustituirlo)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#svm-lineal">4.2.5. SVM lineal</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#naive-bayes-gaussiano">4.2.6. Naive Bayes (gaussiano)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tabla-comparativa-final-pyspark">4.3. Tabla comparativa final (PySpark)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#curvas-roc-los-6-modelos-superpuestos">4.4. Curvas ROC (los 6 modelos superpuestos)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matrices-de-confusion-umbral-natural-0-5-de-probabilidad-o-margen-0">4.5. Matrices de confusión (umbral natural: 0,5 de probabilidad, o margen 0)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tres-hallazgos-que-solo-aparecen-al-comparar-con-scikit-learn">4.6. Tres hallazgos que solo aparecen al comparar con scikit-learn</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-el-arbol-de-decision-sigue-rindiendo-algo-peor-en-spark-incluso-ya-corregido-auc-0-720-contra-0-737">(a) El árbol de decisión sigue rindiendo algo peor en Spark, incluso ya corregido (AUC 0,720 contra 0,737)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#b-linearsvc-no-colapsa-en-spark-auc-0-704-contra-0-559-en-scikit-learn">(b) <code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code> no colapsa en Spark (AUC 0,704 contra 0,559 en scikit-learn)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#c-naive-bayes-el-mismo-error-que-en-a-no-una-diferencia-real-entre-librerias">(c) Naive Bayes: el mismo error que en (a), no una diferencia real entre librerías</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#costo-computacional-scikit-learn-contra-pyspark-modelo-por-modelo">4.7. Costo computacional: scikit-learn contra PySpark, modelo por modelo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sintesis-mejor-modelo-del-entorno-pyspark">4.8. Síntesis: mejor modelo del entorno PySpark</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Santiago Díaz, Gina Huguet y Leiry Mares
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

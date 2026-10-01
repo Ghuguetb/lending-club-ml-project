@@ -1,0 +1,973 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>3. Modelado con scikit-learn &#8212; Proyecto Integrador de Aprendizaje Automático - Lending Club Loan Data</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '03_modelado_sklearn';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="4. Modelado con PySpark" href="04_modelado_pyspark.html" />
+    <link rel="prev" title="2. Preprocesamiento" href="02_preprocesamiento.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="00_intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Proyecto Integrador de Aprendizaje Automático - Lending Club Loan Data</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="00_intro.html">
+                    Tarea 1: Proyecto Integrador de Aprendizaje Automático
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_eda.html">1. Exploración de Datos (EDA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_preprocesamiento.html">2. Preprocesamiento</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">3. Modelado con scikit-learn</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_modelado_pyspark.html">4. Modelado con PySpark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_delong.html">5. Prueba de DeLong con corrección de Holm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_mcnemar_bootstrap.html">6. McNemar y bootstrap pareado, con el umbral elegido solo con datos de entrenamiento</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_lime.html">7. Interpretabilidad con LIME</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_conclusiones.html">8. Comparación final y reflexión crítica</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/03_modelado_sklearn.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>3. Modelado con scikit-learn</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#carga-de-resultados-modelos-y-puntajes-guardados">3.1. Carga de resultados, modelos y puntajes guardados</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modelo-por-modelo-malla-de-hiperparametros-y-razonamiento">3.2. Modelo por modelo: malla de hiperparámetros y razonamiento</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#regresion-logistica">3.2.1. Regresión logística</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arbol-de-decision">3.2.2. Árbol de decisión</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bosque-aleatorio-randomforest-el-mas-costoso-de-todos">3.2.3. Bosque aleatorio (RandomForest), el más costoso de todos</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gradient-boosting-reemplazado-por-histgradientboostingclassifier">3.2.4. Gradient Boosting, reemplazado por <code class="docutils literal notranslate"><span class="pre">HistGradientBoostingClassifier</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#svm-lineal-linearsvc-perdida-hinge">3.2.5. SVM lineal (<code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code>, pérdida hinge)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#naive-bayes-gaussiannb">3.2.6. Naive Bayes (<code class="docutils literal notranslate"><span class="pre">GaussianNB</span></code>)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tabla-comparativa-final">3.3. Tabla comparativa final</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#curvas-roc-los-6-modelos-superpuestos">3.4. Curvas ROC (los 6 modelos superpuestos)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matrices-de-confusion-umbral-0-5">3.5. Matrices de confusión (umbral = 0,5)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#por-que-el-f1-es-tan-bajo-umbral-de-0-5-mas-desbalance-de-clases">3.6. Por qué el F1 es tan bajo: umbral de 0,5 más desbalance de clases</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#diagnostico-el-colapso-de-linearsvc">3.7. Diagnóstico: el colapso de <code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#costo-computacional-vs-beneficio">3.8. Costo computacional vs. beneficio</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sintesis-mejor-modelo-del-entorno-scikit-learn">3.9. Síntesis: mejor modelo del entorno scikit-learn</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="modelado-con-scikit-learn">
+<h1>3. Modelado con scikit-learn<a class="headerlink" href="#modelado-con-scikit-learn" title="Link to this heading">#</a></h1>
+<p>Entrenamos los 6 modelos que pide el enunciado usando <code class="docutils literal notranslate"><span class="pre">GridSearchCV</span></code> (cv=3, <code class="docutils literal notranslate"><span class="pre">scoring=\&quot;roc_auc\&quot;</span></code>), sin envolverlos en un <code class="docutils literal notranslate"><span class="pre">Pipeline</span></code>, porque los datos ya llegan preprocesados desde la sección 2: matrices dispersas <code class="docutils literal notranslate"><span class="pre">X_train</span></code>/<code class="docutils literal notranslate"><span class="pre">X_test</span></code> con 114 columnas, ya imputadas, escaladas y codificadas, todo ajustado únicamente con el conjunto de entrenamiento.</p>
+<p>El hardware real de esta máquina es de 2 núcleos y 7,8 GB de RAM, sin GPU.</p>
+<p>Entrenar los 6 modelos completos (<code class="docutils literal notranslate"><span class="pre">src/model_sklearn.py</span></code>) tardó alrededor de 3 horas y 35 minutos en esta máquina, dominado sobre todo por <code class="docutils literal notranslate"><span class="pre">RandomForestClassifier</span></code> (112 minutos) y <code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code> (80 minutos), que explicamos más abajo. Ese tiempo hace poco práctico volver a correr todo el entrenamiento cada vez que se reconstruye este Jupyter Book, así que en este notebook documentamos el código exacto que usamos para entrenar cada modelo (como bloques de referencia, no como celdas que se vuelven a ejecutar), y cargamos los resultados y modelos ya entrenados para construir las tablas, gráficos y diagnósticos de esta sección.</p>
+<section id="carga-de-resultados-modelos-y-puntajes-guardados">
+<h2>3.1. Carga de resultados, modelos y puntajes guardados<a class="headerlink" href="#carga-de-resultados-modelos-y-puntajes-guardados" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">joblib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">roc_curve</span><span class="p">,</span> <span class="n">auc</span><span class="p">,</span> <span class="n">confusion_matrix</span>
+
+<span class="n">results_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">"../outputs/tables/sklearn_results.csv"</span><span class="p">)</span>
+<span class="n">scores_test</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="s2">"../data/sklearn_test_scores.parquet"</span><span class="p">)</span>
+<span class="n">models_fitted</span> <span class="o">=</span> <span class="n">joblib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">"../data/sklearn_fitted_models.joblib"</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"../outputs/tables/hardware_sklearn.json"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">hardware</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="n">y_test</span> <span class="o">=</span> <span class="n">scores_test</span><span class="p">[</span><span class="s2">"default"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Hardware usado:"</span><span class="p">,</span> <span class="n">hardware</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Conjunto de prueba: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">y_test</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> filas, tasa de default = </span><span class="si">{</span><span class="n">y_test</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Modelos entrenados: </span><span class="si">{</span><span class="n">results_df</span><span class="p">[</span><span class="s1">'modelo'</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Hardware usado: {'cores': 2, 'ram_gb': 7.8, 'nota': 'maquina virtual compartida, sin GPU'}
+Conjunto de prueba: 452,141 filas, tasa de default = 11.88%
+
+Modelos entrenados: ['LogisticRegression', 'DecisionTree', 'RandomForest', 'GBT_HistGB', 'LinearSVC', 'GaussianNB']
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="modelo-por-modelo-malla-de-hiperparametros-y-razonamiento">
+<h2>3.2. Modelo por modelo: malla de hiperparámetros y razonamiento<a class="headerlink" href="#modelo-por-modelo-malla-de-hiperparametros-y-razonamiento" title="Link to this heading">#</a></h2>
+<p>A continuación está el código de referencia que usamos en <code class="docutils literal notranslate"><span class="pre">src/model_sklearn.py</span></code> para cada uno de los 6 modelos.</p>
+<section id="regresion-logistica">
+<h3>3.2.1. Regresión logística<a class="headerlink" href="#regresion-logistica" title="Link to this heading">#</a></h3>
+<p>La malla de <code class="docutils literal notranslate"><span class="pre">C</span></code> se define a partir de <code class="docutils literal notranslate"><span class="pre">n_train</span></code> (1.808.560 filas), siguiendo la convención de que <code class="docutils literal notranslate"><span class="pre">C</span> <span class="pre">=</span> <span class="pre">1/(alpha·n)</span></code> en scikit-learn equivale al parámetro de regularización <code class="docutils literal notranslate"><span class="pre">alpha</span></code> de otras librerías. Usamos tres órdenes de magnitud de <code class="docutils literal notranslate"><span class="pre">alpha</span></code> (1e-6, 1e-5, 1e-4) para no limitar la búsqueda a un solo vecindario de regularización.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">C_vals</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">rp</span><span class="o">*</span><span class="n">n_train</span><span class="p">)</span> <span class="k">for</span> <span class="n">rp</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">1e-6</span><span class="p">,</span> <span class="mf">1e-5</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">]]</span>\<span class="n">ngs</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">LogisticRegression</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">),</span>\<span class="n">n</span>                   <span class="p">{</span>\<span class="s2">"C</span><span class="se">\"</span><span class="s2">: C_vals}, cv=3, scoring=</span><span class="se">\"</span><span class="s2">roc_auc</span><span class="se">\"</span><span class="s2">, n_jobs=-1)</span><span class="se">\n</span><span class="s2">gs.fit(X_train, y_train)</span>
+</pre></div>
+</div>
+</section>
+<section id="arbol-de-decision">
+<h3>3.2.2. Árbol de decisión<a class="headerlink" href="#arbol-de-decision" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">gs</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">),</span>\<span class="n">n</span>                   <span class="p">{</span>\<span class="s2">"max_depth</span><span class="se">\"</span><span class="s2">: [5, 10, 15]}, cv=3, scoring=</span><span class="se">\"</span><span class="s2">roc_auc</span><span class="se">\"</span><span class="s2">, n_jobs=-1)</span><span class="se">\n</span><span class="s2">gs.fit(X_train, y_train)</span>
+</pre></div>
+</div>
+</section>
+<section id="bosque-aleatorio-randomforest-el-mas-costoso-de-todos">
+<h3>3.2.3. Bosque aleatorio (RandomForest), el más costoso de todos<a class="headerlink" href="#bosque-aleatorio-randomforest-el-mas-costoso-de-todos" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">gs</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>\<span class="n">n</span>                   <span class="p">{</span>\<span class="s2">"n_estimators</span><span class="se">\"</span><span class="s2">: [10, 50, 100], </span><span class="se">\"</span><span class="s2">max_depth</span><span class="se">\"</span><span class="s2">: [5, 10, 15]},</span><span class="se">\n</span><span class="s2">                   cv=3, scoring=</span><span class="se">\"</span><span class="s2">roc_auc</span><span class="se">\"</span><span class="s2">, n_jobs=-1)</span><span class="se">\n</span><span class="s2">gs.fit(X_train, y_train)</span>
+</pre></div>
+</div>
+<p>Usamos <code class="docutils literal notranslate"><span class="pre">n_jobs=1</span></code> dentro del estimador y <code class="docutils literal notranslate"><span class="pre">n_jobs=-1</span></code> en <code class="docutils literal notranslate"><span class="pre">GridSearchCV</span></code>, para paralelizar entre las 27 combinaciones de la malla (9 combinaciones por 3 pliegues) en vez de dentro de cada bosque. Si paralelizáramos los dos niveles a la vez, los procesos competirían por los mismos 2 núcleos sin ninguna ganancia real. Aun así, este modelo tomó 6.739 segundos (casi 112 minutos) solo en el ajuste final, porque la combinación ganadora fue la más pesada de la malla (<code class="docutils literal notranslate"><span class="pre">n_estimators=100,</span> <span class="pre">max_depth=15</span></code>), y con <code class="docutils literal notranslate"><span class="pre">n_jobs=1</span></code> sus 100 árboles se entrenan uno tras otro sobre 1,8 millones de filas.</p>
+</section>
+<section id="gradient-boosting-reemplazado-por-histgradientboostingclassifier">
+<h3>3.2.4. Gradient Boosting, reemplazado por <code class="docutils literal notranslate"><span class="pre">HistGradientBoostingClassifier</span></code><a class="headerlink" href="#gradient-boosting-reemplazado-por-histgradientboostingclassifier" title="Link to this heading">#</a></h3>
+<p>El enunciado permite sustituir <code class="docutils literal notranslate"><span class="pre">GradientBoostingClassifier</span></code> por <code class="docutils literal notranslate"><span class="pre">HistGradientBoostingClassifier</span></code> cuando el costo computacional es demasiado alto, y en nuestro caso lo era: <code class="docutils literal notranslate"><span class="pre">GradientBoostingClassifier</span></code> no tiene paralelismo entre árboles porque cada árbol depende del residuo del anterior, y para 1,8 millones de filas el tiempo estimado era de varias horas. Además, <code class="docutils literal notranslate"><span class="pre">HistGradientBoostingClassifier</span></code> usa el mismo algoritmo de histogramas que <code class="docutils literal notranslate"><span class="pre">GBTClassifier</span></code> de Spark, lo que hace la comparación entre los dos entornos más justa.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">X_train_dense</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>   <span class="c1"># HistGradientBoosting no admite entrada dispersa\nX_test_dense = X_test.toarray()\ngs = GridSearchCV(HistGradientBoostingClassifier(learning_rate=0.1, random_state=42),\n                   {\"max_iter\": [50, 100], \"max_depth\": [3, 5]}, cv=3, scoring=\"roc_auc\", n_jobs=-1)\ngs.fit(X_train_dense, y_train)</span>
+</pre></div>
+</div>
+</section>
+<section id="svm-lineal-linearsvc-perdida-hinge">
+<h3>3.2.5. SVM lineal (<code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code>, pérdida hinge)<a class="headerlink" href="#svm-lineal-linearsvc-perdida-hinge" title="Link to this heading">#</a></h3>
+<p>Usamos <code class="docutils literal notranslate"><span class="pre">loss=\&quot;hinge\&quot;,</span> <span class="pre">dual=True</span></code> en vez de la configuración por defecto de scikit-learn (<code class="docutils literal notranslate"><span class="pre">squared_hinge</span></code>, <code class="docutils literal notranslate"><span class="pre">dual=\&quot;auto\&quot;</span></code>), para que la función de pérdida coincida con la de <code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code> de Spark, que solo tiene la versión hinge estándar. Como <code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code> no tiene <code class="docutils literal notranslate"><span class="pre">predict_proba</span></code>, usamos <code class="docutils literal notranslate"><span class="pre">decision_function()</span></code> para obtener un puntaje continuo, que necesitamos más adelante para la prueba de DeLong.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">gs</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">LinearSVC</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span>\<span class="s2">"hinge</span><span class="se">\"</span><span class="s2">, dual=True, max_iter=5000, random_state=42),</span><span class="se">\n</span><span class="s2">                   {</span><span class="se">\"</span><span class="s2">C</span><span class="se">\"</span><span class="s2">: C_vals}, cv=3, scoring=</span><span class="se">\"</span><span class="s2">roc_auc</span><span class="se">\"</span><span class="s2">, n_jobs=-1)</span><span class="se">\n</span><span class="s2">gs.fit(X_train, y_train)</span><span class="se">\n</span><span class="s2">y_score = gs.decision_function(X_test)</span>
+</pre></div>
+</div>
+<p>Este modelo tardó 4.839 segundos (unos 81 minutos), y como se ve en la sección 3.7, el resultado tiene un problema serio que vale la pena revisar por separado.</p>
+</section>
+<section id="naive-bayes-gaussiannb">
+<h3>3.2.6. Naive Bayes (<code class="docutils literal notranslate"><span class="pre">GaussianNB</span></code>)<a class="headerlink" href="#naive-bayes-gaussiannb" title="Link to this heading">#</a></h3>
+<p>El enunciado no pide búsqueda de hiperparámetros para este modelo, porque no tiene ninguno relevante que ajustar por grilla. Como <code class="docutils literal notranslate"><span class="pre">GaussianNB</span></code> tampoco admite entrada dispersa, reutilizamos la versión densa que ya habíamos creado para <code class="docutils literal notranslate"><span class="pre">HistGradientBoostingClassifier</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nb_model</span> <span class="o">=</span> <span class="n">GaussianNB</span><span class="p">()</span>\<span class="n">nnb_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_dense</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>\<span class="n">ncv_auc_nb</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">GaussianNB</span><span class="p">(),</span> <span class="n">X_train_dense</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>\<span class="n">n</span>                             <span class="n">scoring</span><span class="o">=</span>\<span class="s2">"roc_auc</span><span class="se">\"</span><span class="s2">, n_jobs=-1).mean()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="tabla-comparativa-final">
+<h2>3.3. Tabla comparativa final<a class="headerlink" href="#tabla-comparativa-final" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cols_show</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"modelo"</span><span class="p">,</span><span class="s2">"best_params"</span><span class="p">,</span><span class="s2">"cv_auc"</span><span class="p">,</span><span class="s2">"test_auc"</span><span class="p">,</span><span class="s2">"test_accuracy"</span><span class="p">,</span>
+             <span class="s2">"test_precision"</span><span class="p">,</span><span class="s2">"test_recall"</span><span class="p">,</span><span class="s2">"test_f1"</span><span class="p">,</span><span class="s2">"tiempo_entrenamiento_s"</span><span class="p">,</span><span class="s2">"tiempo_prediccion_s"</span><span class="p">]</span>
+<span class="n">tabla</span> <span class="o">=</span> <span class="n">results_df</span><span class="p">[</span><span class="n">cols_show</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">"test_auc"</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">tabla_fmt</span> <span class="o">=</span> <span class="n">tabla</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"cv_auc"</span><span class="p">,</span><span class="s2">"test_auc"</span><span class="p">,</span><span class="s2">"test_accuracy"</span><span class="p">,</span><span class="s2">"test_precision"</span><span class="p">,</span><span class="s2">"test_recall"</span><span class="p">,</span><span class="s2">"test_f1"</span><span class="p">]:</span>
+    <span class="n">tabla_fmt</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">tabla_fmt</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">tabla_fmt</span><span class="p">[</span><span class="s2">"tiempo_entrenamiento_s"</span><span class="p">]</span> <span class="o">=</span> <span class="n">tabla_fmt</span><span class="p">[</span><span class="s2">"tiempo_entrenamiento_s"</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">tabla_fmt</span><span class="p">[</span><span class="s2">"tiempo_prediccion_s"</span><span class="p">]</span> <span class="o">=</span> <span class="n">tabla_fmt</span><span class="p">[</span><span class="s2">"tiempo_prediccion_s"</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">tabla_fmt</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>modelo</th>
+      <th>best_params</th>
+      <th>cv_auc</th>
+      <th>test_auc</th>
+      <th>test_accuracy</th>
+      <th>test_precision</th>
+      <th>test_recall</th>
+      <th>test_f1</th>
+      <th>tiempo_entrenamiento_s</th>
+      <th>tiempo_prediccion_s</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>GBT_HistGB</td>
+      <td>{"max_depth": 5, "max_iter": 100}</td>
+      <td>0.7098</td>
+      <td>0.7393</td>
+      <td>0.8812</td>
+      <td>0.5125</td>
+      <td>0.0023</td>
+      <td>0.0046</td>
+      <td>600.4</td>
+      <td>4.59</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>DecisionTree</td>
+      <td>{"max_depth": 10}</td>
+      <td>0.6689</td>
+      <td>0.7368</td>
+      <td>0.8810</td>
+      <td>0.2683</td>
+      <td>0.0012</td>
+      <td>0.0024</td>
+      <td>509.1</td>
+      <td>0.08</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>RandomForest</td>
+      <td>{"max_depth": 15, "n_estimators": 100}</td>
+      <td>0.7109</td>
+      <td>0.7225</td>
+      <td>0.8812</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>6739.3</td>
+      <td>4.80</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>LogisticRegression</td>
+      <td>{"C": 0.05529260848409784}</td>
+      <td>0.7141</td>
+      <td>0.7221</td>
+      <td>0.8804</td>
+      <td>0.3742</td>
+      <td>0.0098</td>
+      <td>0.0191</td>
+      <td>70.4</td>
+      <td>0.03</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>GaussianNB</td>
+      <td>{}</td>
+      <td>0.6837</td>
+      <td>0.6935</td>
+      <td>0.2773</td>
+      <td>0.1371</td>
+      <td>0.9605</td>
+      <td>0.2400</td>
+      <td>3.5</td>
+      <td>0.87</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>LinearSVC</td>
+      <td>{"C": 0.05529260848409784}</td>
+      <td>0.5213</td>
+      <td>0.5594</td>
+      <td>0.8812</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>4838.7</td>
+      <td>0.74</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Por AUC de prueba, el orden de los modelos queda así: <code class="docutils literal notranslate"><span class="pre">GBT_HistGB</span></code> (0,739), <code class="docutils literal notranslate"><span class="pre">DecisionTree</span></code> (0,737), <code class="docutils literal notranslate"><span class="pre">RandomForest</span></code> (0,722), <code class="docutils literal notranslate"><span class="pre">LogisticRegression</span></code> (0,722), <code class="docutils literal notranslate"><span class="pre">GaussianNB</span></code> (0,693) y muy por debajo, <code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code> (0,559). Nos sorprendió bastante que un solo árbol de decisión (no muy profundo, <code class="docutils literal notranslate"><span class="pre">max_depth=10</span></code>) termine con un AUC de prueba parecido al de un bosque aleatorio de 100 árboles, algo que retomamos en la sección 3.8.</p>
+<p>Los valores de <code class="docutils literal notranslate"><span class="pre">test_f1</span></code> son casi todos cercanos a 0, con la excepción de <code class="docutils literal notranslate"><span class="pre">GaussianNB</span></code>. Esto no quiere decir que los modelos sean malos, es más bien un efecto del umbral fijo de 0,5 combinado con el desbalance fuerte de clases (11,88% de <code class="docutils literal notranslate"><span class="pre">default=1</span></code>). Lo explicamos con más detalle en la sección 3.6.</p>
+</section>
+<section id="curvas-roc-los-6-modelos-superpuestos">
+<h2>3.4. Curvas ROC (los 6 modelos superpuestos)<a class="headerlink" href="#curvas-roc-los-6-modelos-superpuestos" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">score_cols</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"LogisticRegression"</span><span class="p">:</span> <span class="s2">"score_LogisticRegression"</span><span class="p">,</span>
+    <span class="s2">"DecisionTree"</span><span class="p">:</span> <span class="s2">"score_DecisionTree"</span><span class="p">,</span>
+    <span class="s2">"RandomForest"</span><span class="p">:</span> <span class="s2">"score_RandomForest"</span><span class="p">,</span>
+    <span class="s2">"GBT_HistGB"</span><span class="p">:</span> <span class="s2">"score_GBT_HistGB"</span><span class="p">,</span>
+    <span class="s2">"LinearSVC"</span><span class="p">:</span> <span class="s2">"score_LinearSVC"</span><span class="p">,</span>
+    <span class="s2">"GaussianNB"</span><span class="p">:</span> <span class="s2">"score_GaussianNB"</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">score_cols</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">roc_curve</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">scores_test</span><span class="p">[</span><span class="n">col</span><span class="p">])</span>
+    <span class="n">roc_auc</span> <span class="o">=</span> <span class="n">auc</span><span class="p">(</span><span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">nombre</span><span class="si">}</span><span class="s2"> (AUC=</span><span class="si">{</span><span class="n">roc_auc</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">)"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.8</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Azar (AUC=0.5)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Tasa de falsos positivos"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Tasa de verdaderos positivos"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Curvas ROC — scikit-learn (conjunto de prueba)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">"lower right"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">"../outputs/figures/eda/roc_sklearn.png"</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">110</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/2113b587503854653bcae72dae95e3e4b8d670e78e272a6c19f3abf6291c66cc.png" src="_images/2113b587503854653bcae72dae95e3e4b8d670e78e272a6c19f3abf6291c66cc.png" />
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code> es, a simple vista, la única curva que se queda pegada a la diagonal de azar, lo cual es consistente con su AUC de 0,559 y con el diagnóstico de la sección 3.7.</p>
+</section>
+<section id="matrices-de-confusion-umbral-0-5">
+<h2>3.5. Matrices de confusión (umbral = 0,5)<a class="headerlink" href="#matrices-de-confusion-umbral-0-5" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="p">(</span><span class="n">nombre</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="o">.</span><span class="n">flat</span><span class="p">,</span> <span class="n">score_cols</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+    <span class="k">if</span> <span class="n">nombre</span> <span class="o">==</span> <span class="s2">"LinearSVC"</span><span class="p">:</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="p">(</span><span class="n">scores_test</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="p">(</span><span class="n">scores_test</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">cm</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"Blues"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">cm</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="s2">"white"</span> <span class="k">if</span> <span class="n">cm</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">cm</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span> <span class="k">else</span> <span class="s2">"black"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="s2">"No default"</span><span class="p">,</span><span class="s2">"Default"</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="s2">"No default"</span><span class="p">,</span><span class="s2">"Default"</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">nombre</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Predicho"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Real"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">"../outputs/figures/eda/confusion_sklearn.png"</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">110</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/35756b99e226d76e08f33d9fc6773659a7e92863b1c215ee1ac34b259a789343.png" src="_images/35756b99e226d76e08f33d9fc6773659a7e92863b1c215ee1ac34b259a789343.png" />
+</div>
+</div>
+</section>
+<section id="por-que-el-f1-es-tan-bajo-umbral-de-0-5-mas-desbalance-de-clases">
+<h2>3.6. Por qué el F1 es tan bajo: umbral de 0,5 más desbalance de clases<a class="headerlink" href="#por-que-el-f1-es-tan-bajo-umbral-de-0-5-mas-desbalance-de-clases" title="Link to this heading">#</a></h2>
+<p>Con solo 11,88% de casos positivos (<code class="docutils literal notranslate"><span class="pre">default=1</span></code>), un modelo puede tener un AUC razonable, es decir, puede ordenar bien los casos de mayor a menor riesgo, y aun así predecir casi nunca “default” si se usa un umbral fijo de 0,5 sobre una probabilidad que rara vez supera ese valor cuando la clase minoritaria es tan poco frecuente. Es justo lo que pasa aquí.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">resumen_umbral</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">score_cols</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">nombre</span> <span class="o">==</span> <span class="s2">"LinearSVC"</span><span class="p">:</span>
+        <span class="n">pred_pos_rate</span> <span class="o">=</span> <span class="p">(</span><span class="n">scores_test</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pred_pos_rate</span> <span class="o">=</span> <span class="p">(</span><span class="n">scores_test</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">resumen_umbral</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"modelo"</span><span class="p">:</span> <span class="n">nombre</span><span class="p">,</span> <span class="s2">"tasa_predicha_positiva"</span><span class="p">:</span> <span class="n">pred_pos_rate</span><span class="p">})</span>
+<span class="n">resumen_umbral</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">resumen_umbral</span><span class="p">)</span>
+<span class="n">resumen_umbral</span><span class="p">[</span><span class="s2">"tasa_real_positiva"</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_test</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">resumen_umbral</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>modelo</th>
+      <th>tasa_predicha_positiva</th>
+      <th>tasa_real_positiva</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>LogisticRegression</td>
+      <td>0.0031</td>
+      <td>0.1188</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>DecisionTree</td>
+      <td>0.0005</td>
+      <td>0.1188</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>RandomForest</td>
+      <td>0.0000</td>
+      <td>0.1188</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>GBT_HistGB</td>
+      <td>0.0005</td>
+      <td>0.1188</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>LinearSVC</td>
+      <td>0.0000</td>
+      <td>0.1188</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>GaussianNB</td>
+      <td>0.8321</td>
+      <td>0.1188</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">RandomForest</span></code> y <code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code> predicen 0% de casos positivos en todo el conjunto de prueba (452.141 filas), literalmente nunca cruzan el umbral. <code class="docutils literal notranslate"><span class="pre">DecisionTree</span></code> y <code class="docutils literal notranslate"><span class="pre">GBT_HistGB</span></code> casi nunca lo hacen tampoco (recall menor a 1%). Solo <code class="docutils literal notranslate"><span class="pre">GaussianNB</span></code> predice positivo en una fracción alta de los casos (83%), lo que invierte el problema: gana mucho recall (0,96) pero a costa de una precisión muy baja (0,14) y una exactitud que cae a 27,7%, justo lo contrario de lo que pasa con el resto de los modelos.</p>
+<p>Por esta razón el enunciado pide, más adelante, elegir el umbral de clasificación usando solo el conjunto de entrenamiento para la prueba de McNemar, en vez de usar 0,5 sin pensarlo. Con un umbral calibrado al desbalance real, estos mismos modelos se verían mucho más razonables. El AUC, que no depende de ningún umbral, sigue siendo la métrica más útil para comparar modelos en esta sección.</p>
+</section>
+<section id="diagnostico-el-colapso-de-linearsvc">
+<h2>3.7. Diagnóstico: el colapso de <code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code><a class="headerlink" href="#diagnostico-el-colapso-de-linearsvc" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">svc</span> <span class="o">=</span> <span class="n">models_fitted</span><span class="p">[</span><span class="s2">"LinearSVC"</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Iteraciones hasta convergencia (n_iter_):"</span><span class="p">,</span> <span class="n">svc</span><span class="o">.</span><span class="n">n_iter_</span><span class="p">,</span> <span class="s2">"de max_iter ="</span><span class="p">,</span> <span class="n">svc</span><span class="o">.</span><span class="n">max_iter</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"C seleccionado:"</span><span class="p">,</span> <span class="n">svc</span><span class="o">.</span><span class="n">C</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Coeficientes: min=</span><span class="si">{</span><span class="n">svc</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s2">.4g</span><span class="si">}</span><span class="s2">  max=</span><span class="si">{</span><span class="n">svc</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s2">.4g</span><span class="si">}</span><span class="s2">  "</span>
+      <span class="sa">f</span><span class="s2">"media=</span><span class="si">{</span><span class="n">svc</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.4g</span><span class="si">}</span><span class="s2">  std=</span><span class="si">{</span><span class="n">svc</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="si">:</span><span class="s2">.4g</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Intercepto:"</span><span class="p">,</span> <span class="n">svc</span><span class="o">.</span><span class="n">intercept_</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Coeficientes con valor &gt; 0:"</span><span class="p">,</span> <span class="p">(</span><span class="n">svc</span><span class="o">.</span><span class="n">coef_</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="s2">"de"</span><span class="p">,</span> <span class="n">svc</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="n">score_svc</span> <span class="o">=</span> <span class="n">scores_test</span><span class="p">[</span><span class="s2">"score_LinearSVC"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">decision_function en prueba: min=</span><span class="si">{</span><span class="n">score_svc</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s2">.6g</span><span class="si">}</span><span class="s2"> max=</span><span class="si">{</span><span class="n">score_svc</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s2">.6g</span><span class="si">}</span><span class="s2"> "</span>
+      <span class="sa">f</span><span class="s2">"media=</span><span class="si">{</span><span class="n">score_svc</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.6g</span><span class="si">}</span><span class="s2"> std=</span><span class="si">{</span><span class="n">score_svc</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="si">:</span><span class="s2">.4g</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Valores únicos de decision_function:"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">score_svc</span><span class="p">)),</span> <span class="s2">"de"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">score_svc</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Iteraciones hasta convergencia (n_iter_): 633 de max_iter = 5000
+C seleccionado: 0.05529260848409784
+
+Coeficientes: min=-0.1451  max=3.868e-13  media=-0.02648  std=0.03687
+Intercepto: -0.377377377421153
+Coeficientes con valor &gt; 0: 11 de 114
+
+decision_function en prueba: min=-1 max=-1 media=-1 std=4.92e-12
+Valores únicos de decision_function: 26764 de 452141
+</pre></div>
+</div>
+</div>
+</div>
+<p>El modelo sí convergió (633 iteraciones de un máximo de 5.000, así que no es un problema de falta de iteraciones). El problema está en dónde convergió: prácticamente todos los coeficientes son negativos o básicamente cero, y el puntaje de <code class="docutils literal notranslate"><span class="pre">decision_function</span></code> sobre el conjunto de prueba queda pegado a -1 en el 100% de las filas. En la práctica, el modelo colapsó a un clasificador casi constante que predice “no default” para todo el mundo.</p>
+<p>¿Por qué pasa esto y no le pasa a la regresión logística con el mismo <code class="docutils literal notranslate"><span class="pre">C</span></code>? La malla de <code class="docutils literal notranslate"><span class="pre">C</span></code> que usamos (con el mismo criterio que la regresión logística) da valores de regularización muy pequeños para un dataset de 1,8 millones de filas, lo que en la práctica equivale a una regularización bastante fuerte. Con la regresión logística, el gradiente sigue empujando el modelo hacia probabilidades informativas incluso con regularización fuerte. Pero con la pérdida hinge de <code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code>, y sin ponderar las clases, el modelo puede cumplir mejor su objetivo simplemente encogiendo los coeficientes hacia cero y dejando que el intercepto diga que no hay default para nadie, en vez de arriesgarse con el 88% de los casos negativos. Es un problema conocido de las SVM sin ponderación de clases sobre datos muy desbalanceados.</p>
+<p>Documentamos esto como un hallazgo real del proyecto, no como un error que haya que esconder, porque es justo el tipo de comparación entre librerías que pide la reflexión final: Spark implementa <code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code> con un optimizador distinto (OWL-QN), y queda la pregunta abierta de si mostrará el mismo colapso con la misma malla de <code class="docutils literal notranslate"><span class="pre">C</span></code>.</p>
+</section>
+<section id="costo-computacional-vs-beneficio">
+<h2>3.8. Costo computacional vs. beneficio<a class="headerlink" href="#costo-computacional-vs-beneficio" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">orden</span> <span class="o">=</span> <span class="n">tabla</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">"tiempo_entrenamiento_s"</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">bars</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">orden</span><span class="p">[</span><span class="s2">"modelo"</span><span class="p">],</span> <span class="n">orden</span><span class="p">[</span><span class="s2">"tiempo_entrenamiento_s"</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"steelblue"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Tiempo de entrenamiento (s, escala log)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Tiempo de entrenamiento por modelo — scikit-learn"</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">bar</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bars</span><span class="p">,</span> <span class="n">orden</span><span class="p">[</span><span class="s2">"tiempo_entrenamiento_s"</span><span class="p">]):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">bar</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span><span class="o">*</span><span class="mf">1.05</span><span class="p">,</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_y</span><span class="p">()</span><span class="o">+</span><span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">t</span><span class="si">:</span><span class="s2">,.0f</span><span class="si">}</span><span class="s2"> s"</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">"../outputs/figures/eda/tiempos_sklearn.png"</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">110</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/198c7a7de377e799b67d6482f99ce6e0a1ca13304de37777b9309fffc3998594.png" src="_images/198c7a7de377e799b67d6482f99ce6e0a1ca13304de37777b9309fffc3998594.png" />
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">RandomForest</span></code> (6.739 s) y <code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code> (4.839 s) dominan por completo el tiempo total de cómputo (juntos son más del 96% del tiempo de los 6 modelos), y ninguno de los dos tiene el mejor desempeño: <code class="docutils literal notranslate"><span class="pre">RandomForest</span></code> termina prácticamente empatado con <code class="docutils literal notranslate"><span class="pre">LogisticRegression</span></code>, que tarda casi 100 veces menos (70 segundos), y <code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code> directamente colapsa. En cambio, <code class="docutils literal notranslate"><span class="pre">HistGradientBoostingClassifier</span></code> logra el mejor AUC de los seis modelos (0,739) en solo 600 segundos, menos de una décima parte del tiempo que toma <code class="docutils literal notranslate"><span class="pre">RandomForest</span></code>. Esto nos muestra que, en un dataset de este tamaño y con hardware limitado, un método de boosting basado en histogramas da una mejor relación entre desempeño y costo que el bagging de árboles independientes.</p>
+</section>
+<section id="sintesis-mejor-modelo-del-entorno-scikit-learn">
+<h2>3.9. Síntesis: mejor modelo del entorno scikit-learn<a class="headerlink" href="#sintesis-mejor-modelo-del-entorno-scikit-learn" title="Link to this heading">#</a></h2>
+<p>Por AUC de prueba, <code class="docutils literal notranslate"><span class="pre">HistGradientBoostingClassifier</span></code> (0,739) es el mejor modelo de este entorno, seguido de cerca por <code class="docutils literal notranslate"><span class="pre">DecisionTreeClassifier</span></code> (0,737). Estos resultados, junto con los puntajes continuos de los 6 modelos que guardamos en <code class="docutils literal notranslate"><span class="pre">data/sklearn_test_scores.parquet</span></code>, son la base de las comparaciones estadísticas de las secciones 5 (DeLong) y 6 (McNemar y bootstrap) más adelante, junto con los resultados que vamos a obtener con PySpark en la siguiente sección.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="02_preprocesamiento.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">2. Preprocesamiento</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="04_modelado_pyspark.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">4. Modelado con PySpark</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#carga-de-resultados-modelos-y-puntajes-guardados">3.1. Carga de resultados, modelos y puntajes guardados</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modelo-por-modelo-malla-de-hiperparametros-y-razonamiento">3.2. Modelo por modelo: malla de hiperparámetros y razonamiento</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#regresion-logistica">3.2.1. Regresión logística</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arbol-de-decision">3.2.2. Árbol de decisión</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bosque-aleatorio-randomforest-el-mas-costoso-de-todos">3.2.3. Bosque aleatorio (RandomForest), el más costoso de todos</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gradient-boosting-reemplazado-por-histgradientboostingclassifier">3.2.4. Gradient Boosting, reemplazado por <code class="docutils literal notranslate"><span class="pre">HistGradientBoostingClassifier</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#svm-lineal-linearsvc-perdida-hinge">3.2.5. SVM lineal (<code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code>, pérdida hinge)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#naive-bayes-gaussiannb">3.2.6. Naive Bayes (<code class="docutils literal notranslate"><span class="pre">GaussianNB</span></code>)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tabla-comparativa-final">3.3. Tabla comparativa final</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#curvas-roc-los-6-modelos-superpuestos">3.4. Curvas ROC (los 6 modelos superpuestos)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matrices-de-confusion-umbral-0-5">3.5. Matrices de confusión (umbral = 0,5)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#por-que-el-f1-es-tan-bajo-umbral-de-0-5-mas-desbalance-de-clases">3.6. Por qué el F1 es tan bajo: umbral de 0,5 más desbalance de clases</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#diagnostico-el-colapso-de-linearsvc">3.7. Diagnóstico: el colapso de <code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#costo-computacional-vs-beneficio">3.8. Costo computacional vs. beneficio</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sintesis-mejor-modelo-del-entorno-scikit-learn">3.9. Síntesis: mejor modelo del entorno scikit-learn</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Santiago Díaz, Gina Huguet y Leiry Mares
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
